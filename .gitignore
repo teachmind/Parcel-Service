@@ -13,3 +13,12 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+build
+.env
+*.out
+coverage.html
+coverage.txt
+.idea/
+**/vendor
+internal/.DS_Store
+.DS_Store
