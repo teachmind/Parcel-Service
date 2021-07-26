@@ -59,6 +59,3 @@ func TestPingHandler(t *testing.T) {
 		assert.Equal(t, w.Code, http.StatusNotFound)
 	})
 }
-
-func TestShutdown(t *testing.T) {
-}
