@@ -34,13 +34,31 @@ func TestNewServer(t *testing.T) {
 		assert.NoError(t, s.Run())
 		assert.NoError(t, s.Shutdown())
 	})
+}
+
+func TestPingHandler(t *testing.T) {
+	t.Run("test server ping handler", func(t *testing.T) {
+		s := NewServer(":2000").route()
+		w := httptest.NewRecorder()
+		r, _ := http.NewRequest(http.MethodGet, "/ping", nil)
+
+		s.ServeHTTP(w, r)
+
+		assert.Equal(t, w.Body.String(), `{"success": "ping"}`)
+		assert.Equal(t, w.Code, http.StatusOK)
+	})
 
 	t.Run("test server ping handler", func(t *testing.T) {
-		handler := NewServer(":2000").route()
-		req, _ := http.NewRequest(http.MethodGet, "/ping", nil)
-		rr := httptest.NewRecorder()
+		s := NewServer(":2000").route()
+		w := httptest.NewRecorder()
+		r, _ := http.NewRequest(http.MethodGet, "/", nil)
 
-		handler.ServeHTTP(rr, req)
-		assert.Equal(t, rr.Body.String(), `{"success": "ping"}`)
+		s.ServeHTTP(w, r)
+
+		assert.Equal(t, w.Body.String(), "404 page not found\n")
+		assert.Equal(t, w.Code, http.StatusNotFound)
 	})
+}
+
+func TestShutdown(t *testing.T) {
 }
