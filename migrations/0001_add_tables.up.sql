@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS carrier_request (
     status int,
     CONSTRAINT parcel_id
         FOREIGN KEY(parcel_id)
-            REFERENCES parcel(id),
+            REFERENCES parcel(id)
+            ON DELETE CASCADE,
     CONSTRAINT status
             FOREIGN KEY(status)
             REFERENCES carrier_request_status(id)
