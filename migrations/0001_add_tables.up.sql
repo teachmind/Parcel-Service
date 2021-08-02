@@ -9,9 +9,9 @@ CREATE TABLE IF NOT EXISTS parcel (
   carrier_id int not null,
   created_at timestamp,
   updated_at timestamp,
-  status int,
-  source_address TEXT,
-  destination_address TEXT,
+  status int not null,
+  source_address TEXT not null,
+  destination_address TEXT not null,
   source_time timestamp,
   type TEXT,
   price float,
@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS carrier_request_status (
 
 CREATE TABLE IF NOT EXISTS carrier_request (
     id serial PRIMARY KEY,
-    parcel_id int,
+    parcel_id int not null,
     carrier_id int not null,
-    status int,
+    status int not null,
     CONSTRAINT parcel_id
         FOREIGN KEY(parcel_id)
             REFERENCES parcel(id)
