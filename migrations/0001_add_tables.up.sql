@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS parcel_status (
 CREATE TABLE IF NOT EXISTS parcel (
   id serial PRIMARY KEY,
   user_id int not null,
-  carrier_id int,
+  carrier_id int not null,
   created_at timestamp,
   updated_at timestamp,
   status int,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS carrier_request_status (
 CREATE TABLE IF NOT EXISTS carrier_request (
     id serial PRIMARY KEY,
     parcel_id int,
-    carrier_id int,
+    carrier_id int not null,
     status int,
     CONSTRAINT parcel_id
         FOREIGN KEY(parcel_id)
