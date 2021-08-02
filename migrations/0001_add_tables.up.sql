@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS parcel_status (
 
 CREATE TABLE IF NOT EXISTS parcel (
   id serial PRIMARY KEY,
-  user_id int,
+  user_id int not null,
   carrier_id int,
   created_at timestamp,
   updated_at timestamp,
