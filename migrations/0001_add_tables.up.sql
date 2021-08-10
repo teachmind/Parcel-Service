@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS carrier_request_status (
 );
 
 CREATE TABLE IF NOT EXISTS carrier_request (
-    id serial PRIMARY KEY,
+    PRIMARY KEY(parcel_id, carrier_id),
     parcel_id int not null,
     carrier_id int not null,
     status int not null,
