@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS parcel (
   source_address TEXT not null,
   destination_address TEXT not null,
   source_time timestamp,
-  type TEXT,
+  type TEXT not null,
   price float,
   carrier_fee float,
   company_fee float,
