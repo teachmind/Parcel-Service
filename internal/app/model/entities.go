@@ -11,7 +11,6 @@ type CarrierRequest struct {
 
 // Validates carrier request input credentials
 func (cr *CarrierRequest) ValidateCarrierId() error {
-
 	if cr.CarrierID == 0 {
 		return fmt.Errorf("Carrier ID is required :%w", ErrEmpty)
 	}

@@ -5,10 +5,10 @@ import (
 	"parcel-service/internal/app/model"
 )
 
-
+//go:generate mockgen -source service.go -destination ./mocks/mock_service.go -package mocks
 // CarrierParcelAcceptRepository to update the carrier request table
 type CarrierParcelAcceptRepository interface {
-	AssignCarrierToParcel(ctx context.Context, parcel model.CarrierRequest) error
+	UpdateCarrierRequest(ctx context.Context, parcel model.CarrierRequest) error
 }
 
 // UserService to fetch user by PhoneNumber and Password

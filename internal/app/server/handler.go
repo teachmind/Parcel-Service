@@ -2,7 +2,7 @@ package server
 
 import (
 	"encoding/json"
-	"errors"
+	//"errors"
 	"net/http"
 	"parcel-service/internal/app/model"
 	"github.com/gorilla/mux"
@@ -31,14 +31,16 @@ func (s *server) parcelCarrierAccept(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.carrierParcelAcceptService.AssignCarrierToParcel(r.Context(), data); err != nil {
-		if errors.Is(err, model.ErrInvalid) {
-		ErrInvalidEntityResponse(w, "invalid user", err)
-		return
-	}
-		log.Error().Err(err).Msgf("[parcel/{id}/accept] failed to assign carrier to parcel: %v", err)
-		ErrInternalServerResponse(w, "failed to assign carrier to parcel", err)
-		return
-	}
-	SuccessResponse(w, http.StatusCreated, key)
+	SuccessResponse(w, http.StatusCreated, "Working")
+
+	//if err := s.carrierParcelAcceptService.AssignCarrierToParcel(r.Context(), data); err != nil {
+	//	if errors.Is(err, model.ErrInvalid) {
+	//	ErrInvalidEntityResponse(w, "invalid user", err)
+	//	return
+	//}
+	//	log.Error().Err(err).Msgf("[parcel/{id}/accept] failed to assign carrier to parcel: %v", err)
+	//	ErrInternalServerResponse(w, "failed to assign carrier to parcel", err)
+	//	return
+	//}
+	//SuccessResponse(w, http.StatusCreated, key)
 }
