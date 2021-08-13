@@ -6,7 +6,13 @@ type CarrierRequest struct {
 	ID          int     `json:"id"`
 	ParcelID 	int 	`json:"parcel_id" db:"parcel_id"`
 	CarrierID   int 	`json:"carrier_id" db:"carrier_id"`
-	status      int     `json:"status" db:"status"`
+	Status      int     `json:"status" db:"status"`
+}
+
+type ParcelStatus struct {
+	Accept int			`json:"accept"`
+	Reject int			`json:"reject"`
+	ParcelStatus int	`json:"parcel_status"`
 }
 
 // Validates carrier request input credentials

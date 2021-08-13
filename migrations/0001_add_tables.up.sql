@@ -40,3 +40,32 @@ CREATE TABLE IF NOT EXISTS carrier_request (
             FOREIGN KEY(status)
             REFERENCES carrier_request_status(id)
 );
+
+insert into parcel_status (status_value)
+Values
+('pending'),
+('assigned'),
+('picked'),
+('reached'),
+('delivered');
+
+insert into parcel (user_id, carrier_id, status, source_address, destination_address, source_time, type, price, carrier_fee, company_fee)
+Values
+(1, 0, 1, 'dhaka', 'rajshahi', '2021-08-13 13:14', 'document', 200, 50, 150),
+(1, 0, 1, 'vola', 'rajshahi', '2021-08-13 13:14', 'document', 200, 50, 150),
+(1, 0, 1, 'mongla', 'rajshahi', '2021-08-13 13:14', 'document', 200, 50, 150),
+(1, 0, 1, 'natore', 'rajshahi', '2021-08-13 13:14', 'document', 200, 50, 150);
+
+insert into carrier_request_status (status_value)
+Values
+('pending'),
+('accept'),
+('rejected');
+
+insert into carrier_request (parcel_id, carrier_id, status)
+values
+(1, 2, 1),
+(1, 3, 1),
+(1, 4, 1),
+(1, 5, 1),
+(1, 6, 1);

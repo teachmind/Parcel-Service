@@ -2,11 +2,13 @@ package parcel_carrier
 
 import (
 	"context"
-	svc "user-service/internal/app/service"
+	"parcel-service/internal/app/model"
+	svc "parcel-service/internal/app/service"
 )
 type service struct {
 	repo svc.CarrierParcelAcceptRepository
 }
+
 
 // NewService is to generate for new repo
 func NewService(repo svc.CarrierParcelAcceptRepository) *service {
@@ -16,6 +18,6 @@ func NewService(repo svc.CarrierParcelAcceptRepository) *service {
 }
 
 // Assign a parcel with a carrier is to accept a carrier and other request will be rejected
-func (s *service) AssignCarrierToParcel(ctx context.Context, parcel model.CarrierRequest) error {
-	return s.repo.AssignCarrierToParcel(ctx, parcel)
+func (s *service) AssignCarrierToParcel(ctx context.Context, parcel model.CarrierRequest, status model.ParcelStatus) error {
+	return s.repo.UpdateCarrierRequest(ctx, parcel, status)
 }
