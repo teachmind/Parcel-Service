@@ -18,6 +18,12 @@ func (s *server) createParcel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// validating input credentials for signing up
+	if err := data.ValidateParcelInput(); err != nil {
+		ErrInvalidEntityResponse(w, "Invalid Input", err)
+		return
+	}
+
+	// validating input credentials for signing up
 	/* if err := data.ValidateAuthentication(); err != nil {
 		ErrInvalidEntityResponse(w, "Invalid Input", err)
 		return

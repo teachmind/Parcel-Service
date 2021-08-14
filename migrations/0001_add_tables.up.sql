@@ -16,15 +16,15 @@ COMMIT;
 BEGIN;
 CREATE TABLE IF NOT EXISTS parcel (
   id SERIAL PRIMARY KEY,
-  user_id INT NOT NULL,
-  carrier_id INT NOT NULL,
+  user_id INT NOT NULL CHECK(user_id > 0),
+  carrier_id INT NOT NULL CHECK(carrier_id > 0),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  status INT NOT NULL DEFAULT 1,
-  source_address TEXT NOT NULL,
-  destination_address TEXT NOT NULL,
+  status INT DEFAULT 1,
+  source_address TEXT NOT NULL CHECK(source_address != ''),
+  destination_address TEXT NOT NULL CHECK(destination_address != ''),
   source_time TIMESTAMP,
-  type TEXT NOT NULL,
+  type TEXT NOT NULL CHECK(type != ''),
   price FLOAT,
   carrier_fee FLOAT,
   company_fee FLOAT,
@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS parcel (
 
 CREATE TRIGGER user_timestamp BEFORE INSERT OR UPDATE ON parcel
 FOR EACH ROW EXECUTE PROCEDURE update_timestamp();
-
 COMMIT;
 
 CREATE TABLE IF NOT EXISTS carrier_request_status (
