@@ -30,7 +30,6 @@ func (p *Parcel) ValidateParcelInput() error {
 		return fmt.Errorf("Parcel Type is required :%w", ErrEmpty)
 	}
 
-	fmt.Println(p.UserID)
 	if p.UserID == 0 {
 		return fmt.Errorf("User ID is required :%w", ErrEmpty)
 	}

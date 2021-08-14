@@ -29,7 +29,7 @@ func NewRepository(db *sqlx.DB) *repository {
 func (r *repository) InsertParcel(ctx context.Context, parcel model.Parcel) error {
 	// actualPhone := RMCodeAndSpace(user.PhoneNumber)
 	fmt.Print(parcel.CarrierFee)
-	if _, err := r.db.ExecContext(ctx, insertParcelQuery, parcel.UserID, 1, parcel.SourceAddress, parcel.DestinationAddress, parcel.SourceTime, parcel.ParcelType, "200", 180, 20); err != nil {
+	if _, err := r.db.ExecContext(ctx, insertParcelQuery, parcel.UserID, 1, parcel.SourceAddress, parcel.DestinationAddress, parcel.SourceTime, parcel.ParcelType, 200.0, 180.0, 20.0); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
 			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
 		}
