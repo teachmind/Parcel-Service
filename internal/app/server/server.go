@@ -27,6 +27,9 @@ func NewServer(port string) *server {
 func (s *server) route() *mux.Router {
 	r := mux.NewRouter()
 	r.Methods(http.MethodGet).Path("/ping").HandlerFunc(s.pingHandler)
+	apiRoute := r.PathPrefix("/api/v1").Subrouter()
+	apiRoute.HandleFunc("/parcel", s.getParcelList).Methods(http.MethodGet)
+
 	return r
 }
 
