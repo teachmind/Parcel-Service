@@ -4,17 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/gorilla/mux"
 	//"errors"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"parcel-service/internal/app/model"
-	"github.com/gorilla/mux"
 	"strconv"
 )
 
 func (s *server) parcelCarrierAccept(w http.ResponseWriter, r *http.Request) {
 	var data model.CarrierRequest
-	var status model.ParcelStatus
 	vars := mux.Vars(r)
 
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
@@ -27,11 +26,6 @@ func (s *server) parcelCarrierAccept(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data.ParcelID = parcelID
-	status.Accept = 2
-	status.Reject = 3
-	status.ParcelStatus = 2 //assigned
-
-
 
 	// validating input credentials for parcel request
 	if err := data.ValidateCarrierId(); err != nil {
@@ -39,9 +33,9 @@ func (s *server) parcelCarrierAccept(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.carrierParcelAcceptService.AssignCarrierToParcel(r.Context(), data, status); err != nil {
+	if err := s.carrierParcelAcceptService.AssignCarrierToParcel(r.Context(), data); err != nil {
 		if errors.Is(err, model.ErrInvalid) {
-			ErrInvalidEntityResponse(w, "invalid user", err)
+			ErrInvalidEntityResponse(w, "invalid Request", err)
 			return
 		}
 		log.Error().Err(err).Msgf("[parcel/{id}/accept] failed to assign carrier to parcel: %v", err)
