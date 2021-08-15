@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS parcel_status (
-  id SERIAL PRIMARY KEY,
-  status_value TEXT
+    id SERIAL PRIMARY KEY,
+    status_value TEXT
 );
 
 BEGIN;
@@ -15,22 +15,22 @@ COMMIT;
 
 BEGIN;
 CREATE TABLE IF NOT EXISTS parcel (
-  id SERIAL PRIMARY KEY,
-  user_id INT NOT NULL CHECK(user_id > 0),
-  carrier_id INT NOT NULL CHECK(carrier_id > 0),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  status INT DEFAULT 1,
-  source_address TEXT NOT NULL CHECK(source_address != ''),
-  destination_address TEXT NOT NULL CHECK(destination_address != ''),
-  source_time TIMESTAMP,
-  type TEXT NOT NULL CHECK(type != ''),
-  price FLOAT,
-  carrier_fee FLOAT,
-  company_fee FLOAT,
-  CONSTRAINT status
-      FOREIGN KEY(status)
-	      REFERENCES parcel_status(id)
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL CHECK(user_id > 0),
+    carrier_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status INT DEFAULT 1,
+    source_address TEXT NOT NULL CHECK(source_address != ''),
+    destination_address TEXT NOT NULL CHECK(destination_address != ''),
+    source_time TIMESTAMP,
+    type TEXT NOT NULL CHECK(type != ''),
+    price FLOAT,
+    carrier_fee FLOAT,
+    company_fee FLOAT,
+    CONSTRAINT status
+        FOREIGN KEY(status)
+            REFERENCES parcel_status(id)
 );
 
 CREATE TRIGGER user_timestamp BEFORE INSERT OR UPDATE ON parcel
