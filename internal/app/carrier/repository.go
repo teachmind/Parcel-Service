@@ -12,7 +12,7 @@ import (
 // sql query and error
 const (
 	errUniqueViolation = pq.ErrorCode("23505")
-	insertCarrierQuery = `INSERT INTO carrier_request (carrier_id, parcel_id, status) VALUES ($1, $2, $3)`
+	insertCarrierQuery = `INSERT INTO carrier_request (carrier_id, parcel_id) VALUES ($1, $2)`
 )
 
 type repository struct {
@@ -27,7 +27,7 @@ func NewRepository(db *sqlx.DB) *repository {
 }
 
 func (r *repository) InsertCarrierRequest(ctx context.Context, request model.CarrierRequest) error {
-	if _, err := r.db.ExecContext(ctx, insertCarrierQuery, request.CarrierID, request.ParcelID, 1); err != nil {
+	if _, err := r.db.ExecContext(ctx, insertCarrierQuery, request.CarrierID, request.ParcelID); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
 			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
 		}

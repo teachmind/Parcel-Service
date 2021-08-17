@@ -11,6 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const (
+	payload = `{ "user_id":1, "source_address":"Dhaka Bangladesh", "destination_address":"Pabna Shadar", "source_time":"2021-10-10 10:10:12", "type":"Document" }`
+)
+
 func TestService_CreateParcel(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

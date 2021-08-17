@@ -22,5 +22,5 @@ type CarrierRequestRepository interface {
 
 // CarrierRequestService to add new carrier request
 type CarrierRequestService interface {
-	AddCarrierReqest(ctx context.Context, carrierReq model.CarrierRequest) error
+	NewCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error
 }

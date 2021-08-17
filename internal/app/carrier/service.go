@@ -18,6 +18,6 @@ func NewService(repo svc.CarrierRequestRepository) *service {
 }
 
 // Add a new carrier request to
-func (s *service) AddCarrierReqest(ctx context.Context, carrierReq model.CarrierRequest) error {
+func (s *service) NewCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error {
 	return s.repo.InsertCarrierRequest(ctx, carrierReq)
 }

@@ -37,7 +37,7 @@ func (s *server) createParcel(w http.ResponseWriter, r *http.Request) {
 	SuccessResponse(w, http.StatusCreated, "successful")
 }
 
-func (s *server) carrierRequest(w http.ResponseWriter, r *http.Request) {
+func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
 	var data model.CarrierRequest
 	vars := mux.Vars(r)
 
@@ -58,7 +58,7 @@ func (s *server) carrierRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.carrierRequestService.AddCarrierReqest(r.Context(), data); err != nil {
+	if err := s.carrierRequestService.NewCarrierRequest(r.Context(), data); err != nil {
 		if errors.Is(err, model.ErrInvalid) {
 			ErrInvalidEntityResponse(w, "invalid Request", err)
 			return

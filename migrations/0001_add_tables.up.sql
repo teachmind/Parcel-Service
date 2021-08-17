@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS parcel (
     carrier_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    status INT DEFAULT 1,
+    status INT NOT NULL DEFAULT 1,
     source_address TEXT NOT NULL CHECK(source_address != ''),
     destination_address TEXT NOT NULL CHECK(destination_address != ''),
     source_time TIMESTAMP,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS carrier_request (
     PRIMARY KEY(parcel_id, carrier_id),
     parcel_id INT NOT NULL,
     carrier_id INT NOT NULL,
-    status INT NOT NULL,
+    status INT NOT NULL DEFAULT 1,
     CONSTRAINT parcel_id
         FOREIGN KEY(parcel_id)
             REFERENCES parcel(id)

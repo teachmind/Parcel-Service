@@ -10,13 +10,13 @@ import (
 )
 
 func TestNewServer(t *testing.T) {
-	bindServer := NewServer(":1000", nil)
+	bindServer := NewServer(":1000", nil, nil)
 	go bindServer.Run()
 	defer bindServer.Shutdown()
 	time.Sleep(1 * time.Second)
 
 	t.Run("test success run server", func(t *testing.T) {
-		s := NewServer(":2000", nil)
+		s := NewServer(":2000", nil, nil)
 		assert.NotNil(t, s)
 
 		go func() {
@@ -29,7 +29,7 @@ func TestNewServer(t *testing.T) {
 	})
 
 	t.Run("test failed run with gracefully shutdown", func(t *testing.T) {
-		s := NewServer(":1000", nil)
+		s := NewServer(":1000", nil, nil)
 		assert.NotNil(t, s)
 		assert.NoError(t, s.Run())
 		assert.NoError(t, s.Shutdown())
@@ -38,7 +38,7 @@ func TestNewServer(t *testing.T) {
 
 func TestPingHandler(t *testing.T) {
 	t.Run("test server ping handler", func(t *testing.T) {
-		s := NewServer(":2000", nil).route()
+		s := NewServer(":2000", nil, nil).route()
 		w := httptest.NewRecorder()
 		r, _ := http.NewRequest(http.MethodGet, "/ping", nil)
 
@@ -49,7 +49,7 @@ func TestPingHandler(t *testing.T) {
 	})
 
 	t.Run("test server ping handler", func(t *testing.T) {
-		s := NewServer(":2000", nil).route()
+		s := NewServer(":2000", nil, nil).route()
 		w := httptest.NewRecorder()
 		r, _ := http.NewRequest(http.MethodGet, "/", nil)
 
