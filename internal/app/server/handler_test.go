@@ -48,7 +48,6 @@ func TestParcelCarrierAccept(t *testing.T)  {
 			payload: `{}`,
 			mockSvc: func() *mocks.MockCarrierParcelAcceptService {
 				s := mocks.NewMockCarrierParcelAcceptService(ctrl)
-				s.EXPECT().AssignCarrierToParcel(gomock.Any(), gomock.Any()).Return(nil)
 				return s
 			},
 			expStatusCode: http.StatusBadRequest,

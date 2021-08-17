@@ -65,5 +65,6 @@ func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.Carr
 		log.Error().Err(err).Msg("[UpdateCarrierRequest] failed to commit transaction")
 		return err
 	}
+	tx.Commit()
 	return nil
 }
