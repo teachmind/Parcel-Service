@@ -23,13 +23,14 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		}
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectBegin()
-		m.ExpectExec("update carrier_request set (.+) where (.+) and (.+)")
-
-		m.ExpectRollback()
-
-		m.ExpectQuery("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)")
+		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
 			WithArgs(2, parcel.ParcelID, parcel.CarrierID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
+		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
+			WithArgs(3 , parcel.ParcelID, parcel.CarrierID).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		m.ExpectRollback()
 
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, 2, 3, 2, time.Now())
