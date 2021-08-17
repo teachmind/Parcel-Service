@@ -17,10 +17,7 @@ func NewService(repo svc.ParcelRepository) *service {
 	}
 }
 
-// CreaetParcel is to hash password, validate credentials and inserting data into database
+// CreaetParcel creates new parcel
 func (s *service) CreateParcel(ctx context.Context, parcel model.Parcel) error {
-	/* if p, err := util.HashPassword(user.Password); err == nil {
-		user.Password = p
-	} */
 	return s.repo.InsertParcel(ctx, parcel)
 }
