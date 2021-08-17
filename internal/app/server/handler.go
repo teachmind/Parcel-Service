@@ -17,17 +17,11 @@ func (s *server) createParcel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// validating input credentials for signing up
+	// validating input credentials for Parcel create
 	if err := data.ValidateParcelInput(); err != nil {
 		ErrInvalidEntityResponse(w, "Invalid Input", err)
 		return
 	}
-
-	// validating input credentials for signing up
-	/* if err := data.ValidateAuthentication(); err != nil {
-		ErrInvalidEntityResponse(w, "Invalid Input", err)
-		return
-	} */
 
 	if err := s.parcelService.CreateParcel(r.Context(), data); err != nil {
 		if errors.Is(err, model.ErrInvalid) {
