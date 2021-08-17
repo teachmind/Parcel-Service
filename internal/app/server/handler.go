@@ -58,7 +58,7 @@ func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.carrierRequestService.NewCarrierRequest(r.Context(), data); err != nil {
+	if err := s.carrierService.NewCarrierRequest(r.Context(), data); err != nil {
 		if errors.Is(err, model.ErrInvalid) {
 			ErrInvalidEntityResponse(w, "invalid Request", err)
 			return

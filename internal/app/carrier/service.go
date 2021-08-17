@@ -7,11 +7,11 @@ import (
 )
 
 type service struct {
-	repo svc.CarrierRequestRepository
+	repo svc.CarrierRepository
 }
 
 // NewService is to generate for new repo
-func NewService(repo svc.CarrierRequestRepository) *service {
+func NewService(repo svc.CarrierRepository) *service {
 	return &service{
 		repo: repo,
 	}

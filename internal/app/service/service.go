@@ -15,12 +15,12 @@ type ParcelService interface {
 	CreateParcel(ctx context.Context, parcel model.Parcel) error
 }
 
-// CarrierParcelRequestRepository to update the carrier request table
-type CarrierRequestRepository interface {
+// CarrierRepository to update the carrier request table
+type CarrierRepository interface {
 	InsertCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error
 }
 
-// CarrierRequestService to add new carrier request
-type CarrierRequestService interface {
+// CarrierService to add new carrier request
+type CarrierService interface {
 	NewCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error
 }

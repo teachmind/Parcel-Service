@@ -10,17 +10,17 @@ import (
 )
 
 type server struct {
-	listenAddress         string
-	http                  *http.Server
-	parcelService         service.ParcelService
-	carrierRequestService service.CarrierRequestService
+	listenAddress  string
+	http           *http.Server
+	parcelService  service.ParcelService
+	carrierService service.CarrierService
 }
 
-func NewServer(port string, parcelSvc service.ParcelService, carrierReqSvc service.CarrierRequestService) *server {
+func NewServer(port string, parcelSvc service.ParcelService, carrierSvc service.CarrierService) *server {
 	s := &server{
-		listenAddress:         port,
-		parcelService:         parcelSvc,
-		carrierRequestService: carrierReqSvc,
+		listenAddress:  port,
+		parcelService:  parcelSvc,
+		carrierService: carrierSvc,
 	}
 	s.http = &http.Server{
 		Addr:    port,
