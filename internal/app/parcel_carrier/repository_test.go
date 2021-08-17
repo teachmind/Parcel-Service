@@ -2,55 +2,37 @@ package parcel_carrier
 
 import (
 	"context"
-	"reflect"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"parcel-service/internal/app/model"
 	"testing"
+	"time"
 )
 
-func TestNewRepository(t *testing.T) {
-	type args struct {
-		db *sqlx.DB
-	}
-	tests := []struct {
-		name string
-		args args
-		want *repository
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewRepository(tt.args.db); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewRepository() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+func TestRepository_UpdateCarrierRequest(t *testing.T) {
+	t.Run("should return success", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
 
-func Test_repository_UpdateCarrierRequest(t *testing.T) {
-	type fields struct {
-		db *sqlx.DB
-	}
-	type args struct {
-		ctx    context.Context
-		parcel CarrierRequest
-		status ParcelStatus
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			r := &repository{
-				db: tt.fields.db,
-			}
-			if err := r.UpdateCarrierRequest(tt.args.ctx, tt.args.parcel, tt.args.status); (err != nil) != tt.wantErr {
-				t.Errorf("UpdateCarrierRequest() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+		parcel := model.CarrierRequest{
+			ParcelID: 1,
+			CarrierID:    2,
+			Status:  1,
+		}
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectBegin()
+		m.ExpectExec("update carrier_request set (.+) where (.+) and (.+)")
+
+		m.ExpectRollback()
+
+		m.ExpectQuery("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)")
+			WithArgs(2, parcel.ParcelID, parcel.CarrierID).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		repo := NewRepository(sqlxDB)
+		err := repo.UpdateCarrierRequest(context.Background(), parcel, 2, 3, 2, time.Now())
+		assert.True(t, errors.Is(err, nil))
+	})
 }

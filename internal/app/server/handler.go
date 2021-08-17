@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"errors"
-
 	"github.com/gorilla/mux"
 	//"errors"
 	"github.com/rs/zerolog/log"
@@ -42,5 +41,5 @@ func (s *server) parcelCarrierAccept(w http.ResponseWriter, r *http.Request) {
 		ErrInternalServerResponse(w, "failed to assign carrier to parcel", err)
 		return
 	}
-	SuccessResponse(w, http.StatusCreated, "Success")
+	SuccessResponse(w, http.StatusCreated, "Successful")
 }
