@@ -5,12 +5,12 @@ import (
 	"parcel-service/internal/app/model"
 )
 
-// ParcelRepository to fetch parcel by PhoneNumber
+// ParcelRepository to Insert New Parcel
 type ParcelRepository interface {
 	InsertParcel(ctx context.Context, parcel model.Parcel) error
 }
 
-// ParcelService to fetch parcel by PhoneNumber and Password
+// ParcelService to Create new parcel
 type ParcelService interface {
 	CreateParcel(ctx context.Context, parcel model.Parcel) error
 }
