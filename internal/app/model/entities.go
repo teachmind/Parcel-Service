@@ -16,6 +16,20 @@ type Parcel struct {
 	CompanyFee         float32 `json:"company_fee" db:"company_fee"`
 }
 
+type CarrierRequest struct {
+	ID        int `json:"id"`
+	ParcelID  int `json:"parcel_id" db:"parcel_id"`
+	CarrierID int `json:"carrier_id" db:"carrier_id"`
+	Status    int `json:"status" db:"status"`
+}
+
+func (cr *CarrierRequest) ValidateCarrierId() error {
+	if cr.CarrierID == 0 {
+		return fmt.Errorf("Carrier ID is required :%w", ErrEmpty)
+	}
+	return nil
+}
+
 func (p *Parcel) ValidateParcelInput() error {
 
 	if p.SourceAddress == "" {
