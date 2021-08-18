@@ -15,8 +15,7 @@ import (
 )
 
 const (
-	creaetParcelPayload = `{ "user_id":1, "source_address":"Dhaka Bangladesh", "destination_address":"Pabna Shadar", "source_time":"2021-10-10 10:10:12", "type":"Document" }`
-	carrierReqPayload   = `{ "carrier_id":1, "parcel_id":1 }`
+	payload = `{ "user_id":1, "source_address":"Dhaka Bangladesh", "destination_address":"Pabna Shadar", "source_time":"2021-10-10 10:10:12", "type":"Document" }`
 )
 
 func TestCreatePercel(t *testing.T) {
@@ -32,7 +31,7 @@ func TestCreatePercel(t *testing.T) {
 	}{
 		{
 			desc:    "should success",
-			payload: creaetParcelPayload,
+			payload: payload,
 			mockSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().CreateParcel(gomock.Any(), gomock.Any()).Return(nil)
@@ -52,7 +51,7 @@ func TestCreatePercel(t *testing.T) {
 		},
 		{
 			desc:    "should return invalid parcel error",
-			payload: creaetParcelPayload,
+			payload: payload,
 			mockSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().CreateParcel(gomock.Any(), gomock.Any()).Return(model.ErrInvalid)
@@ -63,7 +62,7 @@ func TestCreatePercel(t *testing.T) {
 		},
 		{
 			desc:    "should return internal server error",
-			payload: creaetParcelPayload,
+			payload: payload,
 			mockSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().CreateParcel(gomock.Any(), gomock.Any()).Return(errors.New("server-error"))
@@ -92,6 +91,7 @@ func TestCreatePercel(t *testing.T) {
 }
 
 func TestAddCarrierRequest(t *testing.T) {
+	carrierReqPayload := `{ "carrier_id":1, "parcel_id":1 }`
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
