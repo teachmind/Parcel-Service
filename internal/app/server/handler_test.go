@@ -88,7 +88,7 @@ func TestCreatePercel(t *testing.T) {
 }
 
 func TestAddCarrierRequest(t *testing.T) {
-	carrierReqPayload := `{ "carrier_id":1, "parcel_id":1 }`
+	payload := `{ "carrier_id":1, "parcel_id":1 }`
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -101,7 +101,7 @@ func TestAddCarrierRequest(t *testing.T) {
 	}{
 		{
 			desc:    "should success",
-			payload: carrierReqPayload,
+			payload: payload,
 			mockSvc: func() *mocks.MockNewCarrierRequestService {
 				s := mocks.NewMockNewCarrierRequestService(ctrl)
 				s.EXPECT().NewCarrierRequest(gomock.Any(), gomock.Any()).Return(nil)
@@ -121,7 +121,7 @@ func TestAddCarrierRequest(t *testing.T) {
 		},
 		{
 			desc:    "should return invalid request error",
-			payload: carrierReqPayload,
+			payload: payload,
 			mockSvc: func() *mocks.MockNewCarrierRequestService {
 				s := mocks.NewMockNewCarrierRequestService(ctrl)
 				s.EXPECT().NewCarrierRequest(gomock.Any(), gomock.Any()).Return(model.ErrInvalid)
@@ -132,7 +132,7 @@ func TestAddCarrierRequest(t *testing.T) {
 		},
 		{
 			desc:    "should return internal server error",
-			payload: carrierReqPayload,
+			payload: payload,
 			mockSvc: func() *mocks.MockNewCarrierRequestService {
 				s := mocks.NewMockNewCarrierRequestService(ctrl)
 				s.EXPECT().NewCarrierRequest(gomock.Any(), gomock.Any()).Return(errors.New("server-error"))
