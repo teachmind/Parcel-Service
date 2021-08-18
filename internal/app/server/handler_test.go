@@ -15,7 +15,7 @@ import (
 )
 
 func TestCreatePercel(t *testing.T) {
-	payload := `{ "user_id":1, "source_address":"Dhaka Bangladesh", "destination_address":"Pabna Shadar", "source_time":"2021-10-10 10:10:12", "type":"Document" }`
+	payload := `{ "user_id":1, "source_address":"Dhaka Bangladesh", "destination_address":"Pabna Shadar", "source_time":"3021-10-10T10:10:12Z", "type":"Document" }`
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 

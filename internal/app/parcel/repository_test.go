@@ -5,6 +5,7 @@ import (
 	"errors"
 	"parcel-service/internal/app/model"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
@@ -17,7 +18,7 @@ func TestRepository_InsertParcel(t *testing.T) {
 		UserID:             1,
 		SourceAddress:      "Dhaka Bangladesh",
 		DestinationAddress: "Pabna Shadar",
-		SourceTime:         "2021-10-10 10: 10: 12",
+		SourceTime:         time.Now(),
 		ParcelType:         "Document",
 		Price:              200.0,
 		CarrierFee:         180.0,

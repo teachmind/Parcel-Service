@@ -6,6 +6,7 @@ import (
 	"parcel-service/internal/app/model"
 	"parcel-service/internal/app/service/mocks"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -15,6 +16,17 @@ func TestService_CreateParcel(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	payload := model.Parcel{
+		UserID:             1,
+		SourceAddress:      "Dhaka Bangladesh",
+		DestinationAddress: "Pabna Shadar",
+		SourceTime:         time.Now(),
+		ParcelType:         "Document",
+		Price:              200.0,
+		CarrierFee:         180.0,
+		CompanyFee:         20.0,
+	}
+
 	testCases := []struct {
 		desc     string
 		payload  model.Parcel
@@ -22,17 +34,8 @@ func TestService_CreateParcel(t *testing.T) {
 		expErr   error
 	}{
 		{
-			desc: "should return success",
-			payload: model.Parcel{
-				UserID:             1,
-				SourceAddress:      "Dhaka Bangladesh",
-				DestinationAddress: "Pabna Shadar",
-				SourceTime:         "2021-10-10 10: 10: 12",
-				ParcelType:         "Document",
-				Price:              200,
-				CarrierFee:         180,
-				CompanyFee:         20,
-			},
+			desc:    "should return success",
+			payload: payload,
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)
 				r.EXPECT().InsertParcel(gomock.Any(), gomock.Any()).Return(nil)
@@ -42,17 +45,8 @@ func TestService_CreateParcel(t *testing.T) {
 		},
 
 		{
-			desc: "should return db error",
-			payload: model.Parcel{
-				UserID:             1,
-				SourceAddress:      "Dhaka Bangladesh",
-				DestinationAddress: "Pabna Shadar",
-				SourceTime:         "2021-10-10 10: 10: 12",
-				ParcelType:         "Document",
-				Price:              200,
-				CarrierFee:         180,
-				CompanyFee:         20,
-			},
+			desc:    "should return db error",
+			payload: payload,
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)
 				r.EXPECT().InsertParcel(gomock.Any(), gomock.Any()).Return(errors.New("db-error"))
