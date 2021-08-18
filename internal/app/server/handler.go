@@ -27,7 +27,7 @@ func (s *server) createParcel(w http.ResponseWriter, r *http.Request) {
 			ErrInvalidEntityResponse(w, "invalid parcel", err)
 			return
 		}
-		log.Error().Err(err).Msgf("[CREATE_PARCEL] failed to create parcel Error: %v", err)
+		log.Error().Err(err).Msgf("[parcel] failed to create parcel Error: %v", err)
 		ErrInternalServerResponse(w, "failed to create parcel", err)
 		return
 	}
