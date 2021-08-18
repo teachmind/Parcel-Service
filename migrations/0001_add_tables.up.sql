@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS parcel_status (
     id SERIAL PRIMARY KEY,
-    status_value TEXT
+    status_value TEXT NOT NULL
 );
 
 BEGIN;
@@ -17,7 +17,7 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS parcel (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL CHECK(user_id > 0),
-    carrier_id INT,
+    carrier_id INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status INT NOT NULL DEFAULT 1,
@@ -39,7 +39,7 @@ COMMIT;
 
 CREATE TABLE IF NOT EXISTS carrier_request_status (
     id SERIAL PRIMARY KEY,
-    status_value TEXT
+    status_value TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS carrier_request (

@@ -12,6 +12,11 @@ import (
 )
 
 func (s *server) createParcel(w http.ResponseWriter, r *http.Request) {
+	const (
+		CARRIER_FEE = 180.00
+		COMPANY_FEE = 20.00
+	)
+
 	var data model.Parcel
 
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
@@ -19,11 +24,14 @@ func (s *server) createParcel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// validating input credentials for Parcel create
 	if err := data.ValidateParcelInput(); err != nil {
 		ErrInvalidEntityResponse(w, "Invalid Input", err)
 		return
 	}
+
+	data.CarrierFee = CARRIER_FEE
+	data.CompanyFee = COMPANY_FEE
+	data.Price = CARRIER_FEE + COMPANY_FEE
 
 	if err := s.parcelService.CreateParcel(r.Context(), data); err != nil {
 		if errors.Is(err, model.ErrInvalid) {

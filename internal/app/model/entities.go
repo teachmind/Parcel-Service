@@ -31,7 +31,6 @@ func (cr *CarrierRequest) ValidateCarrierId() error {
 }
 
 func (p *Parcel) ValidateParcelInput() error {
-
 	if p.SourceAddress == "" {
 		return fmt.Errorf("Source Address is required :%w", ErrEmpty)
 	}
