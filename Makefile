@@ -23,13 +23,16 @@ build:
 	@go build -o $(APP_EXECUTABLE) -ldflags "-X main.commit=$(APP_COMMIT)"
 
 migrate: build
-	@go run main.go migrate
+	@echo "> running database migration"
+	@${APP_EXECUTABLE} migrate
 
 rollback: build
-	@go run main.go rollback
+	@echo "> running rollback command"
+	@${APP_EXECUTABLE} rollback
 
 run: build
-	@go run main.go server
+	@echo "> running server command"
+	@${APP_EXECUTABLE} server
 
 test:
 	@echo "> running test and creating coverage report"
