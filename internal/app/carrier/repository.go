@@ -1,4 +1,4 @@
-package parcel_carrier
+package carrier
 
 import (
 	"context"

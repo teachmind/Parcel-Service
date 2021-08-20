@@ -40,4 +40,3 @@ CREATE TABLE IF NOT EXISTS carrier_request (
             FOREIGN KEY(status)
             REFERENCES carrier_request_status(id)
 );
-

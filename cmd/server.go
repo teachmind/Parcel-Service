@@ -5,7 +5,7 @@ import (
 	"os/signal"
 	"parcel-service/internal/app/server"
 	"parcel-service/internal/pkg/postgres"
-	"parcel-service/internal/app/parcel_carrier"
+	"parcel-service/internal/app/carrier"
 	"syscall"
 
 	"github.com/rs/zerolog/log"
@@ -30,7 +30,7 @@ var serverCmd = &cobra.Command{
 			panic(err)
 		}
 		s := server.NewServer(os.Getenv("APP_PORT"),
-			parcel_carrier.NewService(parcel_carrier.NewRepository(db)),
+			carrier.NewService(carrier.NewRepository(db)),
 		)
 
 		sig := make(chan os.Signal, 1)

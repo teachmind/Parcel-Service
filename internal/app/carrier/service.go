@@ -1,4 +1,4 @@
-package parcel_carrier
+package carrier
 
 import (
 	"context"
@@ -7,12 +7,12 @@ import (
 	"time"
 )
 type service struct {
-	repo svc.CarrierParcelAcceptRepository
+	repo svc.CarrierAcceptRepository
 }
 
 
 // NewService is to generate for new repo
-func NewService(repo svc.CarrierParcelAcceptRepository) *service {
+func NewService(repo svc.CarrierAcceptRepository) *service {
 	return &service{
 		repo: repo,
 	}

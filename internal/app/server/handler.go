@@ -32,7 +32,7 @@ func (s *server) parcelCarrierAccept(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.carrierParcelAcceptService.AssignCarrierToParcel(r.Context(), data); err != nil {
+	if err := s.carrierAcceptService.AssignCarrierToParcel(r.Context(), data); err != nil {
 		if errors.Is(err, model.ErrInvalid) {
 			ErrInvalidEntityResponse(w, "invalid Request", err)
 			return

@@ -13,7 +13,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockCarrierParcelAcceptRepository is a mock of CarrierParcelAcceptRepository interface.
+// MockCarrierParcelAcceptRepository is a mock of CarrierAcceptRepository interface.
 type MockCarrierParcelAcceptRepository struct {
 	ctrl     *gomock.Controller
 	recorder *MockCarrierParcelAcceptRepositoryMockRecorder

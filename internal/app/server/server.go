@@ -2,22 +2,22 @@ package server
 
 import (
 	"context"
-	"net/http"
-	"parcel-service/internal/app/service"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
+	"net/http"
+	"parcel-service/internal/app/service"
 )
 
 type server struct {
 	listenAddress string
-	http          *http.Server
-	carrierParcelAcceptService	service.CarrierParcelAcceptService
+	http                 *http.Server
+	carrierAcceptService service.CarrierAcceptService
 }
 
-func NewServer(port string, cpAcceptService service.CarrierParcelAcceptService) *server {
+func NewServer(port string, cpAcceptService service.CarrierAcceptService) *server {
 	s := &server{
-		listenAddress: port,
-		carrierParcelAcceptService: cpAcceptService,
+		listenAddress:        port,
+		carrierAcceptService: cpAcceptService,
 	}
 	s.http = &http.Server{
 		Addr:    port,
