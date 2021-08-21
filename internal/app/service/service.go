@@ -9,12 +9,14 @@ import (
 type ParcelRepository interface {
 	InsertParcel(ctx context.Context, parcel model.Parcel) error
 	FetchParcelByID(ctx context.Context, parcelID int) (model.Parcel, error)
+	UpdateParcel(ctx context.Context, parcel model.Parcel) error
 }
 
 // ParcelService to Create new parcel
 type ParcelService interface {
 	CreateParcel(ctx context.Context, parcel model.Parcel) error
 	GetParcelByID(ctx context.Context, parcelID int) (model.Parcel, error)
+	EditParcel(ctx context.Context, parcel model.Parcel) error
 }
 
 // CarrierRepository to update the carrier request table

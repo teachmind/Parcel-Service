@@ -15,6 +15,7 @@ const (
 	errUniqueViolation   = pq.ErrorCode("23505")
 	insertParcelQuery    = `INSERT INTO parcel (user_id, source_address, destination_address, source_time, type, price, carrier_fee, company_fee) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	fetchParcelByIDQuery = `SELECT * FROM parcel WHERE id = $1`
+	updateParcelQuery    = `UPDATE parcel SET status = $1 WHERE id = $2`
 )
 
 type repository struct {
@@ -50,4 +51,27 @@ func (r *repository) FetchParcelByID(ctx context.Context, parcelID int) (model.P
 	}
 
 	return parcel, nil
+}
+
+func (r *repository) UpdateParcel(ctx context.Context, parcel model.Parcel) error {
+	result, err := r.db.ExecContext(ctx, updateParcelQuery, parcel.Status, parcel.ID)
+
+	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
+			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
+		}
+		return err
+	}
+
+	rows, err := result.RowsAffected()
+
+	if err != nil {
+		return fmt.Errorf("%v :%w", err, model.ErrInvalid)
+	}
+
+	if rows == 0 {
+		return fmt.Errorf("parcel %d not updated, please provide valid ID. :%w", parcel.ID, model.ErrNotFound)
+	}
+
+	return nil
 }

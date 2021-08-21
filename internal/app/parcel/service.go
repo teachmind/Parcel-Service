@@ -29,3 +29,11 @@ func (s *service) GetParcelByID(ctx context.Context, parcelID int) (model.Parcel
 
 	return parcel, nil
 }
+
+func (s *service) EditParcel(ctx context.Context, parcel model.Parcel) error {
+	if err := s.repo.UpdateParcel(ctx, parcel); err != nil {
+		return err
+	}
+
+	return nil
+}
