@@ -14,6 +14,12 @@ func TestService_AssignCarrierToParcel(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	payloadData := model.CarrierRequest{
+		ParcelID: 1,
+		CarrierID:    2,
+		Status:  1,
+	}
+
 	testCases := []struct {
 		desc     string
 		payload  model.CarrierRequest
@@ -22,11 +28,7 @@ func TestService_AssignCarrierToParcel(t *testing.T) {
 	}{
 		{
 			desc: "should return success",
-			payload: model.CarrierRequest{
-				ParcelID: 1,
-				CarrierID:    2,
-				Status:  1,
-			},
+			payload: payloadData,
 			mockRepo: func() *mocks.MockCarrierParcelAcceptRepository {
 				r := mocks.NewMockCarrierParcelAcceptRepository(ctrl)
 				r.EXPECT().UpdateCarrierRequest(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
@@ -35,11 +37,7 @@ func TestService_AssignCarrierToParcel(t *testing.T) {
 			expErr: nil,
 		},{
 			desc: "should return db-error",
-			payload: model.CarrierRequest{
-				ParcelID: 1,
-				CarrierID:    2,
-				Status:  1,
-			},
+			payload: payloadData,
 			mockRepo: func() *mocks.MockCarrierParcelAcceptRepository {
 				r := mocks.NewMockCarrierParcelAcceptRepository(ctrl)
 				r.EXPECT().UpdateCarrierRequest(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(errors.New("db-error"))

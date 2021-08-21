@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gorilla/mux"
-	//"errors"
 	"github.com/rs/zerolog/log"
 	"net/http"
 	"parcel-service/internal/app/model"

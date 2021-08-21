@@ -13,16 +13,15 @@ import (
 )
 
 func TestRepository_UpdateCarrierRequest(t *testing.T) {
-	var sourceTime = time.Now()
+	sourceTime := time.Now()
+	parcel := model.CarrierRequest{
+		ParcelID: 1,
+		CarrierID:    2,
+		Status:  1,
+	}
 	t.Run("should return success", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
-
-		parcel := model.CarrierRequest{
-			ParcelID: 1,
-			CarrierID:    2,
-			Status:  1,
-		}
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectBegin()
@@ -46,11 +45,6 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 
-		parcel := model.CarrierRequest{
-			ParcelID: 1,
-			CarrierID:    2,
-			Status:  1,
-		}
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectBegin()
 		m.ExpectExec("UPDATE carrier_request").
@@ -68,11 +62,6 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 
-		parcel := model.CarrierRequest{
-			ParcelID: 1,
-			CarrierID:    2,
-			Status:  1,
-		}
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectBegin()
 		m.ExpectExec("UPDATE carrier_request").
