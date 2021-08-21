@@ -39,10 +39,6 @@ func ErrInternalServerResponse(w http.ResponseWriter, title string, err error) {
 	errorResponse(w, http.StatusInternalServerError, codeInternalServerErr, title, err)
 }
 
-func ErrUnauthorizedResponse(w http.ResponseWriter, title string, err error) {
-	errorResponse(w, http.StatusUnauthorized, codeInvalidErr, title, err)
-}
-
 func errorResponse(w http.ResponseWriter, httpStatusCode int, code string, title string, err error) {
 	renderer.JSON(w, httpStatusCode, model.GenericResponse{
 		Success: false,

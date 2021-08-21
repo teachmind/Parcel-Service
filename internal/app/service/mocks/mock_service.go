@@ -51,6 +51,21 @@ func (mr *MockParcelServiceMockRecorder) CreateParcel(ctx, parcel interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateParcel", reflect.TypeOf((*MockParcelService)(nil).CreateParcel), ctx, parcel)
 }
 
+// GetParcelByID mocks base method
+func (m *MockParcelService) GetParcelByID(ctx context.Context, parcelID int) (model.Parcel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetParcelByID", ctx, parcelID)
+	ret0, _ := ret[0].(model.Parcel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetParcelByID indicates an expected call of GetUserByEmailAndPassword
+func (mr *MockParcelServiceMockRecorder) GetParcelByID(ctx, parcelID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParcelByID", reflect.TypeOf((*MockParcelService)(nil).GetParcelByID), ctx, parcelID)
+}
+
 // MockParcelRepository is a mock of ParcelRepository interface
 type MockParcelRepository struct {
 	ctrl     *gomock.Controller
@@ -86,6 +101,21 @@ func (m *MockParcelRepository) InsertParcel(ctx context.Context, parcel model.Pa
 func (mr *MockParcelRepositoryMockRecorder) InsertParcel(ctx, parcel interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertParcel", reflect.TypeOf((*MockParcelRepository)(nil).InsertParcel), ctx, parcel)
+}
+
+// FetchParcelByID mocks base method
+func (m *MockParcelRepository) FetchParcelByID(ctx context.Context, parcelID int) (model.Parcel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchParcelByID", ctx, parcelID)
+	ret0, _ := ret[0].(model.Parcel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchParcelByID indicates an expected call of FetchParcelByID
+func (mr *MockParcelRepositoryMockRecorder) FetchParcelByID(ctx, parcelID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchParcelByID", reflect.TypeOf((*MockParcelRepository)(nil).FetchParcelByID), ctx, parcelID)
 }
 
 // MockNewCarrierRequestService is a mock of CarrierRequestService interface

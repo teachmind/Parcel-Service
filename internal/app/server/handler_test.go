@@ -22,14 +22,14 @@ func TestCreatePercel(t *testing.T) {
 	testCases := []struct {
 		desc          string
 		payload       string
-		mockSvc       func() *mocks.MockParcelService
+		mockParcelSvc func() *mocks.MockParcelService
 		expStatusCode int
 		expResponse   string
 	}{
 		{
 			desc:    "should success",
 			payload: payload,
-			mockSvc: func() *mocks.MockParcelService {
+			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().CreateParcel(gomock.Any(), gomock.Any()).Return(nil)
 				return s
@@ -40,7 +40,7 @@ func TestCreatePercel(t *testing.T) {
 		{
 			desc:    "should return decode error",
 			payload: `------------`,
-			mockSvc: func() *mocks.MockParcelService {
+			mockParcelSvc: func() *mocks.MockParcelService {
 				return mocks.NewMockParcelService(ctrl)
 			},
 			expStatusCode: http.StatusUnprocessableEntity,
@@ -49,7 +49,7 @@ func TestCreatePercel(t *testing.T) {
 		{
 			desc:    "should return invalid parcel error",
 			payload: payload,
-			mockSvc: func() *mocks.MockParcelService {
+			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().CreateParcel(gomock.Any(), gomock.Any()).Return(model.ErrInvalid)
 				return s
@@ -60,7 +60,7 @@ func TestCreatePercel(t *testing.T) {
 		{
 			desc:    "should return internal server error",
 			payload: payload,
-			mockSvc: func() *mocks.MockParcelService {
+			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().CreateParcel(gomock.Any(), gomock.Any()).Return(errors.New("server-error"))
 				return s
@@ -72,14 +72,14 @@ func TestCreatePercel(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			s := NewServer(":8080", tc.mockSvc(), nil)
+			s := NewServer(":8080", tc.mockParcelSvc(), nil)
 
 			w := httptest.NewRecorder()
 			body := strings.NewReader(tc.payload)
 			r := httptest.NewRequest(http.MethodPost, "/api/v1/parcel", body)
 
 			router := mux.NewRouter()
-			router.Methods(http.MethodPost).Path("/api/v1/parcel").HandlerFunc(s.createParcel)
+			router.Methods(http.MethodPost).Path("/api/v1/parcel").HandlerFunc(s.newParcel)
 			router.ServeHTTP(w, r)
 			assert.Equal(t, tc.expStatusCode, w.Code)
 			assert.Equal(t, tc.expResponse, w.Body.String())
@@ -93,16 +93,16 @@ func TestAddCarrierRequest(t *testing.T) {
 	defer ctrl.Finish()
 
 	testCases := []struct {
-		desc          string
-		payload       string
-		mockSvc       func() *mocks.MockNewCarrierRequestService
-		expStatusCode int
-		expResponse   string
+		desc           string
+		payload        string
+		mockCarrierSvc func() *mocks.MockNewCarrierRequestService
+		expStatusCode  int
+		expResponse    string
 	}{
 		{
 			desc:    "should success",
 			payload: payload,
-			mockSvc: func() *mocks.MockNewCarrierRequestService {
+			mockCarrierSvc: func() *mocks.MockNewCarrierRequestService {
 				s := mocks.NewMockNewCarrierRequestService(ctrl)
 				s.EXPECT().NewCarrierRequest(gomock.Any(), gomock.Any()).Return(nil)
 				return s
@@ -113,7 +113,7 @@ func TestAddCarrierRequest(t *testing.T) {
 		{
 			desc:    "should return decode error",
 			payload: `------------`,
-			mockSvc: func() *mocks.MockNewCarrierRequestService {
+			mockCarrierSvc: func() *mocks.MockNewCarrierRequestService {
 				return mocks.NewMockNewCarrierRequestService(ctrl)
 			},
 			expStatusCode: http.StatusUnprocessableEntity,
@@ -122,7 +122,7 @@ func TestAddCarrierRequest(t *testing.T) {
 		{
 			desc:    "should return invalid request error",
 			payload: payload,
-			mockSvc: func() *mocks.MockNewCarrierRequestService {
+			mockCarrierSvc: func() *mocks.MockNewCarrierRequestService {
 				s := mocks.NewMockNewCarrierRequestService(ctrl)
 				s.EXPECT().NewCarrierRequest(gomock.Any(), gomock.Any()).Return(model.ErrInvalid)
 				return s
@@ -133,7 +133,7 @@ func TestAddCarrierRequest(t *testing.T) {
 		{
 			desc:    "should return internal server error",
 			payload: payload,
-			mockSvc: func() *mocks.MockNewCarrierRequestService {
+			mockCarrierSvc: func() *mocks.MockNewCarrierRequestService {
 				s := mocks.NewMockNewCarrierRequestService(ctrl)
 				s.EXPECT().NewCarrierRequest(gomock.Any(), gomock.Any()).Return(errors.New("server-error"))
 				return s
@@ -145,7 +145,7 @@ func TestAddCarrierRequest(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			s := NewServer(":8080", nil, tc.mockSvc())
+			s := NewServer(":8080", nil, tc.mockCarrierSvc())
 
 			w := httptest.NewRecorder()
 			body := strings.NewReader(tc.payload)
@@ -154,6 +154,102 @@ func TestAddCarrierRequest(t *testing.T) {
 
 			router := mux.NewRouter()
 			router.Methods(http.MethodPost).Path("/api/v1/parcel/{id}/request").HandlerFunc(s.addCarrierRequest)
+			router.ServeHTTP(w, r)
+			assert.Equal(t, tc.expStatusCode, w.Code)
+			assert.Equal(t, tc.expResponse, w.Body.String())
+		})
+	}
+}
+func TestGetParcel(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	parcel := model.Parcel{
+		UserID:             1,
+		SourceAddress:      "Dhaka Bangladesh",
+		DestinationAddress: "Pabna Shadar",
+		SourceTime:         "2021-10-10 10: 10: 12",
+		ParcelType:         "Document",
+		Price:              200.0,
+		CarrierFee:         180.0,
+		CompanyFee:         20.0,
+	}
+
+	testCases := []struct {
+		desc          string
+		mockParcelSvc func() *mocks.MockParcelService
+		parcelID      string
+		expStatusCode int
+		expResponse   string
+	}{
+		{
+			desc: "should success",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().GetParcelByID(gomock.Any(), 1).Return(parcel, nil)
+				return s
+			},
+			parcelID:      "1",
+			expStatusCode: http.StatusOK,
+			expResponse:   `{"success":true,"errors":null,"data":{"id":0,"user_id":1,"carrier_id":0,"status":0,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2021-10-10 10: 10: 12","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"","updated_at":""}}`,
+		},
+		{
+			desc: "should return ID not exist",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().GetParcelByID(gomock.Any(), 1).Return(model.Parcel{}, model.ErrInvalid)
+				return s
+			},
+			parcelID:      "1",
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid","message_title":"This ID does not exist.","severity":"error"}],"data":null}`,
+		},
+		{
+			desc: "should return internal server error",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().GetParcelByID(gomock.Any(), 1).
+					Return(model.Parcel{}, errors.New("server-error"))
+				return s
+			},
+			parcelID:      "1",
+			expStatusCode: http.StatusInternalServerError,
+			expResponse:   `{"success":false,"errors":[{"code":"SERVER_ERROR","message":"server-error","message_title":"Failed to fetch parcel 1","severity":"error"}],"data":null}`,
+		},
+		{
+			desc: "should return internal server error",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().GetParcelByID(gomock.Any(), 1).
+					Return(model.Parcel{}, model.ErrNotFound)
+				return s
+			},
+			parcelID:      "1",
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"not found","message_title":"This ID does not exist.","severity":"error"}],"data":null}`,
+		},
+		{
+			desc: "should return invalid parcel ID",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				return s
+			},
+			parcelID:      "__",
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"strconv.Atoi: parsing \"__\": invalid syntax","message_title":"Invalid Parcel ID","severity":"error"}],"data":null}`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			s := NewServer(":8080", tc.mockParcelSvc(), nil)
+
+			w := httptest.NewRecorder()
+			body := strings.NewReader("")
+			r := httptest.NewRequest(http.MethodGet, "/api/v1/parcel/"+tc.parcelID, body)
+			r = mux.SetURLVars(r, map[string]string{"id": tc.parcelID})
+
+			router := mux.NewRouter()
+			router.Methods(http.MethodGet).Path("/api/v1/parcel/{id}").HandlerFunc(s.getParcel)
 			router.ServeHTTP(w, r)
 			assert.Equal(t, tc.expStatusCode, w.Code)
 			assert.Equal(t, tc.expResponse, w.Body.String())

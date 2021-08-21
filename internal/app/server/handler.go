@@ -11,7 +11,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (s *server) createParcel(w http.ResponseWriter, r *http.Request) {
+func (s *server) newParcel(w http.ResponseWriter, r *http.Request) {
 	const (
 		CARRIER_FEE = 180.00
 		COMPANY_FEE = 20.00
@@ -95,10 +95,10 @@ func (s *server) getParcel(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if errors.Is(err, model.ErrInvalid) || errors.Is(err, model.ErrNotFound) {
-			ErrInvalidEntityResponse(w, "Ihis ID does not exist.", err)
+			ErrInvalidEntityResponse(w, "This ID does not exist.", err)
 			return
 		}
-		log.Error().Err(err).Msgf("[parcel/{id}] failed to parcel '%w': %v", data.ID, err)
+		log.Error().Err(err).Msgf("[parcel/{id}] failed to parcel '%d': %v", data.ID, err)
 		ErrInternalServerResponse(w, "Failed to fetch parcel "+strconv.Itoa(data.ID), err)
 		return
 	}
