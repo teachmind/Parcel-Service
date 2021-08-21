@@ -77,3 +77,31 @@ func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	SuccessResponse(w, http.StatusCreated, "Success")
 }
+
+func (s *server) getParcel(w http.ResponseWriter, r *http.Request) {
+	var data model.Parcel
+
+	vars := mux.Vars(r)
+	parcelID, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		ErrInvalidEntityResponse(w, "Invalid Parcel ID", err)
+		return
+	}
+
+	data.ID = parcelID
+
+	parcel, err := s.parcelService.GetParcelByID(r.Context(), data.ID)
+
+	if err != nil {
+		if errors.Is(err, model.ErrInvalid) || errors.Is(err, model.ErrNotFound) {
+			ErrInvalidEntityResponse(w, "Ihis ID does not exist.", err)
+			return
+		}
+		log.Error().Err(err).Msgf("[parcel/{id}] failed to parcel '%w': %v", data.ID, err)
+		ErrInternalServerResponse(w, "Failed to fetch parcel "+strconv.Itoa(data.ID), err)
+		return
+	}
+
+	SuccessResponse(w, http.StatusOK, parcel)
+}

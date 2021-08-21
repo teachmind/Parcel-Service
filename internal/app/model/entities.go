@@ -14,6 +14,8 @@ type Parcel struct {
 	Price              float32 `json:"price" db:"price"`
 	CarrierFee         float32 `json:"carrier_fee" db:"carrier_fee"`
 	CompanyFee         float32 `json:"company_fee" db:"company_fee"`
+	CreatedAt          string  `json:"created_at" db:"created_at"`
+	UpdatedAt          string  `json:"updated_at" db:"updated_at"`
 }
 
 type CarrierRequest struct {
