@@ -36,7 +36,7 @@ func TestRepository_InsertParcel(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.InsertParcel(context.Background(), parcel)
-		assert.True(t, errors.Is(err, nil))
+		assert.Nil(t, err)
 	})
 
 	t.Run("should return unique key violation error", func(t *testing.T) {
@@ -58,12 +58,12 @@ func TestRepository_InsertParcel(t *testing.T) {
 		defer db.Close()
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectExec("INSERT INTO parcels (.+) VALUES (.+)").
+		m.ExpectExec("INSERT INTO parcel (.+) VALUES (.+)").
 			WithArgs().
 			WillReturnError(errors.New("sql-error"))
 
 		repo := NewRepository(sqlxDB)
 		err := repo.InsertParcel(context.Background(), parcel)
-		assert.NotNil(t, err)
+		assert.EqualError(t, err, "sql-error")
 	})
 }
