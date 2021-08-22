@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"parcel-service/internal/app/service"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
@@ -11,11 +12,13 @@ import (
 type server struct {
 	listenAddress string
 	http          *http.Server
+	parcelService service.ParcelService
 }
 
-func NewServer(port string) *server {
+func NewServer(port string, parcelSvc service.ParcelService) *server {
 	s := &server{
 		listenAddress: port,
+		parcelService: parcelSvc,
 	}
 	s.http = &http.Server{
 		Addr:    port,
@@ -26,7 +29,9 @@ func NewServer(port string) *server {
 
 func (s *server) route() *mux.Router {
 	r := mux.NewRouter()
+	apiRoute := r.PathPrefix("/api/v1").Subrouter()
 	r.Methods(http.MethodGet).Path("/ping").HandlerFunc(s.pingHandler)
+	apiRoute.HandleFunc("/parcel", s.createParcel).Methods(http.MethodPost)
 	return r
 }
 

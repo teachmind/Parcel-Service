@@ -7,6 +7,7 @@ import (
 
 var ErrNotFound = fmt.Errorf("not found")
 var ErrInvalid = fmt.Errorf("invalid")
+var ErrEmpty = fmt.Errorf("empty")
 var ErrUnauthorized = errors.New("access denied")
 
 type GenericResponse struct {
