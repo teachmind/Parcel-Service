@@ -13,6 +13,82 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
+// MockParcelService is a mock of ParcelService interface
+type MockParcelService struct {
+	ctrl     *gomock.Controller
+	recorder *MockParcelServiceMockRecorder
+}
+
+// MockParcelServiceMockRecorder is the mock recorder for MockParcelService
+type MockParcelServiceMockRecorder struct {
+	mock *MockParcelService
+}
+
+// NewMockParcelService creates a new mock instance
+func NewMockParcelService(ctrl *gomock.Controller) *MockParcelService {
+	mock := &MockParcelService{ctrl: ctrl}
+	mock.recorder = &MockParcelServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockParcelService) EXPECT() *MockParcelServiceMockRecorder {
+	return m.recorder
+}
+
+// CreateParcel mocks base method
+func (m *MockParcelService) CreateParcel(ctx context.Context, parcel model.Parcel) error {
+
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateParcel", ctx, parcel)
+
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateParcel indicates an expected call of CreateParcel
+func (mr *MockParcelServiceMockRecorder) CreateParcel(ctx, parcel interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateParcel", reflect.TypeOf((*MockParcelService)(nil).CreateParcel), ctx, parcel)
+}
+
+// MockParcelRepository is a mock of ParcelRepository interface
+type MockParcelRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockParcelRepositoryMockRecorder
+}
+
+// MockParcelRepositoryMockRecorder is the mock recorder for MockParcelRepository
+type MockParcelRepositoryMockRecorder struct {
+	mock *MockParcelRepository
+}
+
+// NewMockParcelRepository creates a new mock instance
+func NewMockParcelRepository(ctrl *gomock.Controller) *MockParcelRepository {
+	mock := &MockParcelRepository{ctrl: ctrl}
+	mock.recorder = &MockParcelRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockParcelRepository) EXPECT() *MockParcelRepositoryMockRecorder {
+	return m.recorder
+}
+
+// InsertParcel mocks base method
+func (m *MockParcelRepository) InsertParcel(ctx context.Context, parcel model.Parcel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertParcel", ctx, parcel)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InsertParcel indicates an expected call of InsertParcel
+func (mr *MockParcelRepositoryMockRecorder) InsertParcel(ctx, parcel interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertParcel", reflect.TypeOf((*MockParcelRepository)(nil).InsertParcel), ctx, parcel)
+}
+
 // MockCarrierParcelAcceptRepository is a mock of CarrierAcceptRepository interface.
 type MockCarrierParcelAcceptRepository struct {
 	ctrl     *gomock.Controller

@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 	"os/signal"
+	"parcel-service/internal/app/parcel"
 	"parcel-service/internal/app/server"
 	"parcel-service/internal/pkg/postgres"
 	"parcel-service/internal/app/carrier"
@@ -31,6 +32,7 @@ var serverCmd = &cobra.Command{
 		}
 		s := server.NewServer(os.Getenv("APP_PORT"),
 			carrier.NewService(carrier.NewRepository(db)),
+			parcel.NewService(parcel.NewRepository(db)),
 		)
 
 		sig := make(chan os.Signal, 1)
