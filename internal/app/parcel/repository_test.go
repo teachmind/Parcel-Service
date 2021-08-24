@@ -6,6 +6,7 @@ import (
 	"errors"
 	"parcel-service/internal/app/model"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
@@ -18,7 +19,7 @@ func TestRepository_InsertParcel(t *testing.T) {
 		UserID:             1,
 		SourceAddress:      "Dhaka Bangladesh",
 		DestinationAddress: "Pabna Shadar",
-		SourceTime:         "2021-10-10 10: 10: 12",
+		SourceTime:         time.Now(),
 		ParcelType:         "Document",
 		Price:              200.0,
 		CarrierFee:         180.0,
@@ -36,7 +37,7 @@ func TestRepository_InsertParcel(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.InsertParcel(context.Background(), parcel)
-		assert.True(t, errors.Is(err, nil))
+		assert.Nil(t, err)
 	})
 
 	t.Run("should return unique key violation error", func(t *testing.T) {
@@ -58,13 +59,13 @@ func TestRepository_InsertParcel(t *testing.T) {
 		defer db.Close()
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectExec("INSERT INTO parcels (.+) VALUES (.+)").
+		m.ExpectExec("INSERT INTO parcel (.+) VALUES (.+)").
 			WithArgs().
 			WillReturnError(errors.New("sql-error"))
 
 		repo := NewRepository(sqlxDB)
 		err := repo.InsertParcel(context.Background(), parcel)
-		assert.NotNil(t, err)
+		assert.EqualError(t, err, "sql-error")
 	})
 }
 

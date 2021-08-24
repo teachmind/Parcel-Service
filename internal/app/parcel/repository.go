@@ -29,7 +29,16 @@ func NewRepository(db *sqlx.DB) *repository {
 }
 
 func (r *repository) InsertParcel(ctx context.Context, parcel model.Parcel) error {
-	if _, err := r.db.ExecContext(ctx, insertParcelQuery, parcel.UserID, parcel.SourceAddress, parcel.DestinationAddress, parcel.SourceTime, parcel.ParcelType, parcel.Price, parcel.CarrierFee, parcel.CompanyFee); err != nil {
+	if _, err := r.db.ExecContext(ctx,
+		insertParcelQuery,
+		parcel.UserID,
+		parcel.SourceAddress,
+		parcel.DestinationAddress,
+		parcel.SourceTime,
+		parcel.ParcelType,
+		parcel.Price,
+		parcel.CarrierFee,
+		parcel.CompanyFee); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
 			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
 		}
