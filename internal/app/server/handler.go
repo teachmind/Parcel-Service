@@ -62,7 +62,7 @@ func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
 			ErrInvalidEntityResponse(w, "invalid Request", err)
 			return
 		}
-		log.Error().Err(err).Msgf("[parcel/{id}/request] failed to add new carrier request: %v", err)
+		log.Error().Err(err).Msgf("[NewCarrierRequest] failed to add new carrier request: %v", err)
 		ErrInternalServerResponse(w, "failed to add new carrier request", err)
 		return
 	}
