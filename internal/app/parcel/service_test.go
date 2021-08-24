@@ -77,11 +77,13 @@ func TestService_GetParcelByID(t *testing.T) {
 		UserID:             1,
 		SourceAddress:      "Dhaka Bangladesh",
 		DestinationAddress: "Pabna Shadar",
-		SourceTime:         "2021-10-10 10: 10: 12",
+		SourceTime:         time.Now(),
 		ParcelType:         "Document",
 		Price:              200,
 		CarrierFee:         180,
 		CompanyFee:         20,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	testCases := []struct {

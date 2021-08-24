@@ -8,13 +8,14 @@ import (
 	"parcel-service/internal/app/service/mocks"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreatePercel(t *testing.T) {
+func TestNewParcel(t *testing.T) {
 	payload := `{ "user_id":1, "source_address":"Dhaka Bangladesh", "destination_address":"Pabna Shadar", "source_time":"3021-10-10T10:10:12Z", "type":"Document" }`
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -167,11 +168,13 @@ func TestGetParcel(t *testing.T) {
 		UserID:             1,
 		SourceAddress:      "Dhaka Bangladesh",
 		DestinationAddress: "Pabna Shadar",
-		SourceTime:         "2021-10-10 10: 10: 12",
+		SourceTime:         time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
 		ParcelType:         "Document",
 		Price:              200.0,
 		CarrierFee:         180.0,
 		CompanyFee:         20.0,
+		CreatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+		UpdatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
 	}
 
 	testCases := []struct {
@@ -190,7 +193,7 @@ func TestGetParcel(t *testing.T) {
 			},
 			parcelID:      "1",
 			expStatusCode: http.StatusOK,
-			expResponse:   `{"success":true,"errors":null,"data":{"id":0,"user_id":1,"carrier_id":0,"status":0,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2021-10-10 10: 10: 12","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"","updated_at":""}}`,
+			expResponse:   `{"success":true,"errors":null,"data":{"id":0,"user_id":1,"carrier_id":0,"status":0,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2020-04-11T21:34:01Z","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"2020-04-11T21:34:01Z","updated_at":"2020-04-11T21:34:01Z"}}`,
 		},
 		{
 			desc: "should return ID not exist",
