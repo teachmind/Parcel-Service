@@ -10,15 +10,17 @@ import (
 )
 
 type server struct {
-	listenAddress string
-	http          *http.Server
-	parcelService service.ParcelService
+	listenAddress  string
+	http           *http.Server
+	parcelService  service.ParcelService
+	carrierService service.CarrierService
 }
 
-func NewServer(port string, parcelSvc service.ParcelService) *server {
+func NewServer(port string, parcelSvc service.ParcelService, carrierSvc service.CarrierService) *server {
 	s := &server{
-		listenAddress: port,
-		parcelService: parcelSvc,
+		listenAddress:  port,
+		parcelService:  parcelSvc,
+		carrierService: carrierSvc,
 	}
 	s.http = &http.Server{
 		Addr:    port,
@@ -32,6 +34,7 @@ func (s *server) route() *mux.Router {
 	apiRoute := r.PathPrefix("/api/v1").Subrouter()
 	r.Methods(http.MethodGet).Path("/ping").HandlerFunc(s.pingHandler)
 	apiRoute.HandleFunc("/parcel", s.createParcel).Methods(http.MethodPost)
+	apiRoute.HandleFunc("/parcel/{id}/request", s.addCarrierRequest).Methods(http.MethodPost)
 	return r
 }
 

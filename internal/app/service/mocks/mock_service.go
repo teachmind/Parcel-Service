@@ -87,3 +87,95 @@ func (mr *MockParcelRepositoryMockRecorder) InsertParcel(ctx, parcel interface{}
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertParcel", reflect.TypeOf((*MockParcelRepository)(nil).InsertParcel), ctx, parcel)
 }
+
+// MockNewCarrierRequestService is a mock of CarrierRequestService interface
+type MockNewCarrierRequestService struct {
+	ctrl     *gomock.Controller
+	recorder *MockNewCarrierRequestServiceMockRecorder
+}
+
+// MockNewCarrierRequestServiceMockRecorder is the mock recorder for MockNewCarrierRequestService
+type MockNewCarrierRequestServiceMockRecorder struct {
+	mock *MockNewCarrierRequestService
+}
+
+// NewMockNewCarrierRequestService creates a new mock instance
+func NewMockNewCarrierRequestService(ctrl *gomock.Controller) *MockNewCarrierRequestService {
+	mock := &MockNewCarrierRequestService{ctrl: ctrl}
+	mock.recorder = &MockNewCarrierRequestServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockNewCarrierRequestService) EXPECT() *MockNewCarrierRequestServiceMockRecorder {
+	return m.recorder
+}
+
+// NewCarrierRequest mocks base method
+func (m *MockNewCarrierRequestService) NewCarrierRequest(ctx context.Context, carrierRequest model.CarrierRequest) error {
+
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewCarrierRequest", ctx, carrierRequest)
+
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewCarrierRequest indicates an expected call of NewCarrierRequest
+func (mr *MockNewCarrierRequestServiceMockRecorder) NewCarrierRequest(ctx, carrierRequest interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewCarrierRequest", reflect.TypeOf((*MockNewCarrierRequestService)(nil).NewCarrierRequest), ctx, carrierRequest)
+}
+
+// AddCarrierRequest mocks base method
+func (m *MockNewCarrierRequestService) AddCarrierRequest(ctx context.Context, carrierRequest model.CarrierRequest) error {
+
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddCarrierRequest", ctx, carrierRequest)
+
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddCarrierRequest indicates an expected call of AddCarrierRequest
+func (mr *MockNewCarrierRequestServiceMockRecorder) AddCarrierRequest(ctx, carrierRequest interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCarrierRequest", reflect.TypeOf((*MockNewCarrierRequestService)(nil).AddCarrierRequest), ctx, carrierRequest)
+}
+
+// MockCarrierRequestRepository is a mock of CarrierRequestRepository interface
+type MockCarrierRequestRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockCarrierRequestRepositoryMockRecorder
+}
+
+// MockCarrierRequestRepositoryMockRecorder is the mock recorder for MockCarrierRequestRepository
+type MockCarrierRequestRepositoryMockRecorder struct {
+	mock *MockCarrierRequestRepository
+}
+
+// NewMockCarrierRequestRepository creates a new mock instance
+func NewMockCarrierRequestRepository(ctrl *gomock.Controller) *MockCarrierRequestRepository {
+	mock := &MockCarrierRequestRepository{ctrl: ctrl}
+	mock.recorder = &MockCarrierRequestRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use
+func (m *MockCarrierRequestRepository) EXPECT() *MockCarrierRequestRepositoryMockRecorder {
+	return m.recorder
+}
+
+// InsertCarrierRequest mocks base method
+func (m *MockCarrierRequestRepository) InsertCarrierRequest(ctx context.Context, carrierRequest model.CarrierRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertCarrierRequest", ctx, carrierRequest)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InsertCarrierRequest indicates an expected call of InsertCarrierRequest
+func (mr *MockCarrierRequestRepositoryMockRecorder) InsertCarrierRequest(ctx, carrierRequest interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertCarrierRequest", reflect.TypeOf((*MockCarrierRequestRepository)(nil).InsertCarrierRequest), ctx, carrierRequest)
+}

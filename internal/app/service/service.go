@@ -14,3 +14,13 @@ type ParcelRepository interface {
 type ParcelService interface {
 	CreateParcel(ctx context.Context, parcel model.Parcel) error
 }
+
+// CarrierRepository to update the carrier request table
+type CarrierRepository interface {
+	InsertCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error
+}
+
+// CarrierService to add new carrier request
+type CarrierService interface {
+	NewCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error
+}
