@@ -4,6 +4,8 @@ import (
 	"context"
 	"parcel-service/internal/app/model"
 	svc "parcel-service/internal/app/service"
+
+	"github.com/rs/zerolog/log"
 )
 
 type service struct {
@@ -33,6 +35,7 @@ func (s *service) GetParcelByID(ctx context.Context, parcelID int) (model.Parcel
 	parcel, err := s.repo.FetchParcelByID(ctx, parcelID)
 
 	if err != nil {
+		log.Error().Err(err).Msgf("[GetParcelByID] failed to get parcel Error: %v", err)
 		return model.Parcel{}, err
 	}
 

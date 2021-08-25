@@ -8,6 +8,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"github.com/rs/zerolog/log"
 )
 
 // SQL Query and error
@@ -52,6 +53,7 @@ func (r *repository) FetchParcelByID(ctx context.Context, parcelID int) (model.P
 
 	if err := r.db.GetContext(ctx, &parcel, fetchParcelByIDQuery, parcelID); err != nil {
 		if err == sql.ErrNoRows {
+			log.Error().Err(err).Msgf("[FetchParcelByID] failed to fetch parcel Error: %v", err)
 			return model.Parcel{}, fmt.Errorf("parcel %d is not found. :%w", parcelID, model.ErrNotFound)
 		}
 
