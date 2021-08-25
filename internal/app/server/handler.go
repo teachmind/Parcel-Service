@@ -51,7 +51,6 @@ func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	data.ParcelID = parcelID
 
-	// validating input credentials for parcel request
 	if err := data.ValidateCarrierId(); err != nil {
 		ErrInvalidEntityResponse(w, "Invalid Input", err)
 		return
@@ -62,7 +61,7 @@ func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
 			ErrInvalidEntityResponse(w, "invalid Request", err)
 			return
 		}
-		log.Error().Err(err).Msgf("[NewCarrierRequest] failed to add new carrier request: %v", err)
+		log.Error().Err(err).Msgf("[addCarrierRequest] failed to add new carrier request: %v", err)
 		ErrInternalServerResponse(w, "failed to add new carrier request", err)
 		return
 	}
@@ -89,7 +88,7 @@ func (s *server) getParcel(w http.ResponseWriter, r *http.Request) {
 			ErrInvalidEntityResponse(w, "This ID does not exist.", err)
 			return
 		}
-		log.Error().Err(err).Msgf("[parcel/{id}] failed to parcel '%d': %v", data.ID, err)
+		log.Error().Err(err).Msgf("[getParcel] failed to parcel '%d': %v", data.ID, err)
 		ErrInternalServerResponse(w, "Failed to fetch parcel "+strconv.Itoa(data.ID), err)
 		return
 	}
