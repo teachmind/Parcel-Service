@@ -6,6 +6,7 @@ import (
 	"errors"
 	"parcel-service/internal/app/model"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
@@ -18,11 +19,13 @@ func TestRepository_InsertParcel(t *testing.T) {
 		UserID:             1,
 		SourceAddress:      "Dhaka Bangladesh",
 		DestinationAddress: "Pabna Shadar",
-		SourceTime:         "2021-10-10 10: 10: 12",
+		SourceTime:         time.Now(),
 		ParcelType:         "Document",
 		Price:              200.0,
 		CarrierFee:         180.0,
 		CompanyFee:         20.0,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	t.Run("should return success", func(t *testing.T) {
@@ -36,7 +39,7 @@ func TestRepository_InsertParcel(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.InsertParcel(context.Background(), parcel)
-		assert.True(t, errors.Is(err, nil))
+		assert.Nil(t, err)
 	})
 
 	t.Run("should return unique key violation error", func(t *testing.T) {
@@ -58,13 +61,13 @@ func TestRepository_InsertParcel(t *testing.T) {
 		defer db.Close()
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectExec("INSERT INTO parcels (.+) VALUES (.+)").
+		m.ExpectExec("INSERT INTO parcel (.+) VALUES (.+)").
 			WithArgs().
 			WillReturnError(errors.New("sql-error"))
 
 		repo := NewRepository(sqlxDB)
 		err := repo.InsertParcel(context.Background(), parcel)
-		assert.NotNil(t, err)
+		assert.EqualError(t, err, "sql-error")
 	})
 }
 
@@ -73,11 +76,13 @@ func TestRepository_FetchParcelByID(t *testing.T) {
 		UserID:             1,
 		SourceAddress:      "Dhaka Bangladesh",
 		DestinationAddress: "Pabna Shadar",
-		SourceTime:         "2021-10-10 10: 10: 12",
+		SourceTime:         time.Now(),
 		ParcelType:         "Document",
 		Price:              200.0,
 		CarrierFee:         180.0,
 		CompanyFee:         20.0,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 	t.Run("should return success", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
@@ -85,8 +90,8 @@ func TestRepository_FetchParcelByID(t *testing.T) {
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+)").
-			WillReturnRows(sqlmock.NewRows([]string{"user_id", "source_address", "destination_address", "source_time", "type", "price", "carrier_fee", "company_fee"}).
-				AddRow(parcel.UserID, parcel.SourceAddress, parcel.DestinationAddress, parcel.SourceTime, parcel.ParcelType, parcel.Price, parcel.CarrierFee, parcel.CompanyFee))
+			WillReturnRows(sqlmock.NewRows([]string{"user_id", "source_address", "destination_address", "source_time", "type", "price", "carrier_fee", "company_fee", "created_at", "updated_at"}).
+				AddRow(parcel.UserID, parcel.SourceAddress, parcel.DestinationAddress, parcel.SourceTime, parcel.ParcelType, parcel.Price, parcel.CarrierFee, parcel.CompanyFee, parcel.CreatedAt, parcel.UpdatedAt))
 
 		repo := NewRepository(sqlxDB)
 		result, err := repo.FetchParcelByID(context.Background(), parcel.ID)
@@ -118,6 +123,6 @@ func TestRepository_FetchParcelByID(t *testing.T) {
 			WillReturnError(errors.New("sql-error"))
 		repo := NewRepository(sqlxDB)
 		_, err := repo.FetchParcelByID(context.Background(), 1)
-		assert.NotNil(t, err)
+		assert.EqualError(t, err, "sql-error")
 	})
 }

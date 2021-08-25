@@ -29,7 +29,7 @@ func TestRepository_InsertCarrierRequest(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.InsertCarrierRequest(context.Background(), carrierRequest)
-		assert.True(t, errors.Is(err, nil))
+		assert.Nil(t, err)
 	})
 
 	t.Run("should return unique key violation error", func(t *testing.T) {
@@ -61,12 +61,12 @@ func TestRepository_InsertCarrierRequest(t *testing.T) {
 		}
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectExec("INSERT INTO carrier_requests (.+) VALUES (.+)").
+		m.ExpectExec("INSERT INTO carrier_request (.+) VALUES (.+)").
 			WithArgs().
 			WillReturnError(errors.New("sql-error"))
 
 		repo := NewRepository(sqlxDB)
 		err := repo.InsertCarrierRequest(context.Background(), carrierRequest)
-		assert.NotNil(t, err)
+		assert.EqualError(t, err, "sql-error")
 	})
 }

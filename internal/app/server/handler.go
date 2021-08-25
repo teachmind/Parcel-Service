@@ -12,11 +12,6 @@ import (
 )
 
 func (s *server) newParcel(w http.ResponseWriter, r *http.Request) {
-	const (
-		CARRIER_FEE = 180.00
-		COMPANY_FEE = 20.00
-	)
-
 	var data model.Parcel
 
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
@@ -29,16 +24,12 @@ func (s *server) newParcel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data.CarrierFee = CARRIER_FEE
-	data.CompanyFee = COMPANY_FEE
-	data.Price = CARRIER_FEE + COMPANY_FEE
-
 	if err := s.parcelService.CreateParcel(r.Context(), data); err != nil {
 		if errors.Is(err, model.ErrInvalid) {
 			ErrInvalidEntityResponse(w, "invalid parcel", err)
 			return
 		}
-		log.Error().Err(err).Msgf("[signUp] failed to create parcel Error: %v", err)
+		log.Error().Err(err).Msgf("[parcel] failed to create parcel Error: %v", err)
 		ErrInternalServerResponse(w, "failed to create parcel", err)
 		return
 	}
@@ -60,7 +51,6 @@ func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
 	}
 	data.ParcelID = parcelID
 
-	// validating input credentials for parcel request
 	if err := data.ValidateCarrierId(); err != nil {
 		ErrInvalidEntityResponse(w, "Invalid Input", err)
 		return
@@ -71,7 +61,7 @@ func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
 			ErrInvalidEntityResponse(w, "invalid Request", err)
 			return
 		}
-		log.Error().Err(err).Msgf("[parcel/{id}/request] failed to add new carrier request: %v", err)
+		log.Error().Err(err).Msgf("[addCarrierRequest] failed to add new carrier request: %v", err)
 		ErrInternalServerResponse(w, "failed to add new carrier request", err)
 		return
 	}
@@ -98,7 +88,7 @@ func (s *server) getParcel(w http.ResponseWriter, r *http.Request) {
 			ErrInvalidEntityResponse(w, "This ID does not exist.", err)
 			return
 		}
-		log.Error().Err(err).Msgf("[parcel/{id}] failed to parcel '%d': %v", data.ID, err)
+		log.Error().Err(err).Msgf("[getParcel] failed to parcel '%d': %v", data.ID, err)
 		ErrInternalServerResponse(w, "Failed to fetch parcel "+strconv.Itoa(data.ID), err)
 		return
 	}
