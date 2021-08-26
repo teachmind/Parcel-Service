@@ -25,7 +25,6 @@ var serverCmd = &cobra.Command{
 			Password: os.Getenv("DB_PASSWORD"),
 			Name:     os.Getenv("DB_NAME"),
 		})
-		println(db)
 
 		if err != nil {
 			panic(err)

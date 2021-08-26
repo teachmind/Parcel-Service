@@ -37,7 +37,7 @@ func TestNewServer(t *testing.T) {
 }
 
 func TestPingHandler(t *testing.T) {
-	t.Run("test server ping handler", func(t *testing.T) {
+	t.Run("Test success", func(t *testing.T) {
 		s := NewServer(":2000", nil, nil).route()
 		w := httptest.NewRecorder()
 		r, _ := http.NewRequest(http.MethodGet, "/ping", nil)
@@ -48,7 +48,7 @@ func TestPingHandler(t *testing.T) {
 		assert.Equal(t, w.Code, http.StatusOK)
 	})
 
-	t.Run("test server ping handler", func(t *testing.T) {
+	t.Run("Test page not found", func(t *testing.T) {
 		s := NewServer(":2000", nil, nil).route()
 		w := httptest.NewRecorder()
 		r, _ := http.NewRequest(http.MethodGet, "/", nil)

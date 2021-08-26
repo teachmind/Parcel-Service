@@ -2,6 +2,7 @@ package parcel
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"parcel-service/internal/app/model"
 	"testing"
@@ -23,6 +24,8 @@ func TestRepository_InsertParcel(t *testing.T) {
 		Price:              200.0,
 		CarrierFee:         180.0,
 		CompanyFee:         20.0,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
 	}
 
 	t.Run("should return success", func(t *testing.T) {
@@ -64,6 +67,62 @@ func TestRepository_InsertParcel(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.InsertParcel(context.Background(), parcel)
+		assert.EqualError(t, err, "sql-error")
+	})
+}
+
+func TestRepository_FetchParcelByID(t *testing.T) {
+	parcel := model.Parcel{
+		UserID:             1,
+		SourceAddress:      "Dhaka Bangladesh",
+		DestinationAddress: "Pabna Shadar",
+		SourceTime:         time.Now(),
+		ParcelType:         "Document",
+		Price:              200.0,
+		CarrierFee:         180.0,
+		CompanyFee:         20.0,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
+	}
+	t.Run("should return success", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+)").
+			WillReturnRows(sqlmock.NewRows([]string{"user_id", "source_address", "destination_address", "source_time", "type", "price", "carrier_fee", "company_fee", "created_at", "updated_at"}).
+				AddRow(parcel.UserID, parcel.SourceAddress, parcel.DestinationAddress, parcel.SourceTime, parcel.ParcelType, parcel.Price, parcel.CarrierFee, parcel.CompanyFee, parcel.CreatedAt, parcel.UpdatedAt))
+
+		repo := NewRepository(sqlxDB)
+		result, err := repo.FetchParcelByID(context.Background(), parcel.ID)
+
+		assert.Nil(t, err)
+		assert.EqualValues(t, parcel, result)
+	})
+
+	t.Run("should return no rows error", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+)").
+			WithArgs(1).
+			WillReturnError(sql.ErrNoRows)
+		repo := NewRepository(sqlxDB)
+		_, err := repo.FetchParcelByID(context.Background(), 1)
+		assert.True(t, errors.Is(err, model.ErrNotFound))
+	})
+
+	t.Run("should return error", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+)").
+			WithArgs(1).
+			WillReturnError(errors.New("sql-error"))
+		repo := NewRepository(sqlxDB)
+		_, err := repo.FetchParcelByID(context.Background(), 1)
 		assert.EqualError(t, err, "sql-error")
 	})
 }
