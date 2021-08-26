@@ -66,6 +66,20 @@ func (mr *MockParcelServiceMockRecorder) GetParcelByID(ctx, parcelID interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParcelByID", reflect.TypeOf((*MockParcelService)(nil).GetParcelByID), ctx, parcelID)
 }
 
+// EditParcel mocks base method
+func (m *MockParcelService) EditParcel(ctx context.Context, parcel model.Parcel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EditParcel", ctx, parcel)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EditParcel indicates an expected call of GetUserByEmailAndPassword
+func (mr *MockParcelServiceMockRecorder) EditParcel(ctx, parcel interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EditParcel", reflect.TypeOf((*MockParcelService)(nil).EditParcel), ctx, parcel)
+}
+
 // MockParcelRepository is a mock of ParcelRepository interface
 type MockParcelRepository struct {
 	ctrl     *gomock.Controller
@@ -118,31 +132,45 @@ func (mr *MockParcelRepositoryMockRecorder) FetchParcelByID(ctx, parcelID interf
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchParcelByID", reflect.TypeOf((*MockParcelRepository)(nil).FetchParcelByID), ctx, parcelID)
 }
 
-// MockNewCarrierRequestService is a mock of CarrierRequestService interface
-type MockNewCarrierRequestService struct {
+// UpdateParcel mocks base method
+func (m *MockParcelRepository) UpdateParcel(ctx context.Context, parcel model.Parcel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateParcel", ctx, parcel)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateParcel indicates an expected call of UpdateParcel
+func (mr *MockParcelRepositoryMockRecorder) UpdateParcel(ctx, parcel interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateParcel", reflect.TypeOf((*MockParcelRepository)(nil).UpdateParcel), ctx, parcel)
+}
+
+// MockCarrierService is a mock of CarrierRequestService interface
+type MockCarrierService struct {
 	ctrl     *gomock.Controller
-	recorder *MockNewCarrierRequestServiceMockRecorder
+	recorder *MockCarrierServiceMockRecorder
 }
 
-// MockNewCarrierRequestServiceMockRecorder is the mock recorder for MockNewCarrierRequestService
-type MockNewCarrierRequestServiceMockRecorder struct {
-	mock *MockNewCarrierRequestService
+// MockCarrierServiceMockRecorder is the mock recorder for MockCarrierService
+type MockCarrierServiceMockRecorder struct {
+	mock *MockCarrierService
 }
 
-// NewMockNewCarrierRequestService creates a new mock instance
-func NewMockNewCarrierRequestService(ctrl *gomock.Controller) *MockNewCarrierRequestService {
-	mock := &MockNewCarrierRequestService{ctrl: ctrl}
-	mock.recorder = &MockNewCarrierRequestServiceMockRecorder{mock}
+// NewMockCarrierService creates a new mock instance
+func NewMockCarrierService(ctrl *gomock.Controller) *MockCarrierService {
+	mock := &MockCarrierService{ctrl: ctrl}
+	mock.recorder = &MockCarrierServiceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockNewCarrierRequestService) EXPECT() *MockNewCarrierRequestServiceMockRecorder {
+func (m *MockCarrierService) EXPECT() *MockCarrierServiceMockRecorder {
 	return m.recorder
 }
 
 // NewCarrierRequest mocks base method
-func (m *MockNewCarrierRequestService) NewCarrierRequest(ctx context.Context, carrierRequest model.CarrierRequest) error {
+func (m *MockCarrierService) NewCarrierRequest(ctx context.Context, carrierRequest model.CarrierRequest) error {
 
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "NewCarrierRequest", ctx, carrierRequest)
@@ -152,13 +180,13 @@ func (m *MockNewCarrierRequestService) NewCarrierRequest(ctx context.Context, ca
 }
 
 // NewCarrierRequest indicates an expected call of NewCarrierRequest
-func (mr *MockNewCarrierRequestServiceMockRecorder) NewCarrierRequest(ctx, carrierRequest interface{}) *gomock.Call {
+func (mr *MockCarrierServiceMockRecorder) NewCarrierRequest(ctx, carrierRequest interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewCarrierRequest", reflect.TypeOf((*MockNewCarrierRequestService)(nil).NewCarrierRequest), ctx, carrierRequest)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewCarrierRequest", reflect.TypeOf((*MockCarrierService)(nil).NewCarrierRequest), ctx, carrierRequest)
 }
 
 // AddCarrierRequest mocks base method
-func (m *MockNewCarrierRequestService) AddCarrierRequest(ctx context.Context, carrierRequest model.CarrierRequest) error {
+func (m *MockCarrierService) AddCarrierRequest(ctx context.Context, carrierRequest model.CarrierRequest) error {
 
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddCarrierRequest", ctx, carrierRequest)
@@ -168,36 +196,36 @@ func (m *MockNewCarrierRequestService) AddCarrierRequest(ctx context.Context, ca
 }
 
 // AddCarrierRequest indicates an expected call of AddCarrierRequest
-func (mr *MockNewCarrierRequestServiceMockRecorder) AddCarrierRequest(ctx, carrierRequest interface{}) *gomock.Call {
+func (mr *MockCarrierServiceMockRecorder) AddCarrierRequest(ctx, carrierRequest interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCarrierRequest", reflect.TypeOf((*MockNewCarrierRequestService)(nil).AddCarrierRequest), ctx, carrierRequest)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddCarrierRequest", reflect.TypeOf((*MockCarrierService)(nil).AddCarrierRequest), ctx, carrierRequest)
 }
 
-// MockCarrierRequestRepository is a mock of CarrierRequestRepository interface
-type MockCarrierRequestRepository struct {
+// MockCarrierRepository is a mock of CarrierRequestRepository interface
+type MockCarrierRepository struct {
 	ctrl     *gomock.Controller
-	recorder *MockCarrierRequestRepositoryMockRecorder
+	recorder *MockCarrierRepositoryMockRecorder
 }
 
-// MockCarrierRequestRepositoryMockRecorder is the mock recorder for MockCarrierRequestRepository
-type MockCarrierRequestRepositoryMockRecorder struct {
-	mock *MockCarrierRequestRepository
+// MockCarrierRepositoryMockRecorder is the mock recorder for MockCarrierRepository
+type MockCarrierRepositoryMockRecorder struct {
+	mock *MockCarrierRepository
 }
 
-// NewMockCarrierRequestRepository creates a new mock instance
-func NewMockCarrierRequestRepository(ctrl *gomock.Controller) *MockCarrierRequestRepository {
-	mock := &MockCarrierRequestRepository{ctrl: ctrl}
-	mock.recorder = &MockCarrierRequestRepositoryMockRecorder{mock}
+// NewMockCarrierRepository creates a new mock instance
+func NewMockCarrierRepository(ctrl *gomock.Controller) *MockCarrierRepository {
+	mock := &MockCarrierRepository{ctrl: ctrl}
+	mock.recorder = &MockCarrierRepositoryMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use
-func (m *MockCarrierRequestRepository) EXPECT() *MockCarrierRequestRepositoryMockRecorder {
+func (m *MockCarrierRepository) EXPECT() *MockCarrierRepositoryMockRecorder {
 	return m.recorder
 }
 
 // InsertCarrierRequest mocks base method
-func (m *MockCarrierRequestRepository) InsertCarrierRequest(ctx context.Context, carrierRequest model.CarrierRequest) error {
+func (m *MockCarrierRepository) InsertCarrierRequest(ctx context.Context, carrierRequest model.CarrierRequest) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "InsertCarrierRequest", ctx, carrierRequest)
 	ret0, _ := ret[0].(error)
@@ -205,7 +233,7 @@ func (m *MockCarrierRequestRepository) InsertCarrierRequest(ctx context.Context,
 }
 
 // InsertCarrierRequest indicates an expected call of InsertCarrierRequest
-func (mr *MockCarrierRequestRepositoryMockRecorder) InsertCarrierRequest(ctx, carrierRequest interface{}) *gomock.Call {
+func (mr *MockCarrierRepositoryMockRecorder) InsertCarrierRequest(ctx, carrierRequest interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertCarrierRequest", reflect.TypeOf((*MockCarrierRequestRepository)(nil).InsertCarrierRequest), ctx, carrierRequest)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertCarrierRequest", reflect.TypeOf((*MockCarrierRepository)(nil).InsertCarrierRequest), ctx, carrierRequest)
 }

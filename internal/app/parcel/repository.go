@@ -68,9 +68,12 @@ func (r *repository) UpdateParcel(ctx context.Context, parcel model.Parcel) erro
 	result, err := r.db.ExecContext(ctx, updateParcelQuery, parcel.Status, parcel.ID)
 
 	if err != nil {
+		log.Error().Err(err).Msgf("[UpdateParcel] failed to update parcel Error: %v", err)
+
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
 			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
 		}
+
 		return err
 	}
 
