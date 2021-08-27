@@ -10,10 +10,6 @@ type service struct {
 	repo svc.CarrierAcceptRepository
 }
 
-type statuses struct {
-	AcceptStatus, RejectStatus,  ParcelStatus int
-}
-
 func NewService(repo svc.CarrierAcceptRepository) *service {
 	return &service{
 		repo: repo,
@@ -21,6 +17,6 @@ func NewService(repo svc.CarrierAcceptRepository) *service {
 }
 
 func (s *service) AssignCarrierToParcel(ctx context.Context, parcel model.CarrierRequest) error {
-	status := statuses{2, 3, 2}
+	status := model.Statuses{2, 3, 2}
 	return s.repo.UpdateCarrierRequest(ctx, parcel, status.AcceptStatus, status.RejectStatus, status.ParcelStatus, time.Now())
 }
