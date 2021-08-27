@@ -22,6 +22,7 @@ func NewServer(port string, parcelSvc service.ParcelService, carrierSvc service.
 		parcelService:  parcelSvc,
 		carrierService: carrierSvc,
 	}
+
 	s.http = &http.Server{
 		Addr:    port,
 		Handler: s.route(),
