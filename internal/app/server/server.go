@@ -7,23 +7,20 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
-	"net/http"
-	"parcel-service/internal/app/service"
 )
 
 type server struct {
-	listenAddress string
-	http                 	*http.Server
-	carrierAcceptService 	service.CarrierAcceptService
-	parcelService 			service.ParcelService
+	listenAddress        string
+	http                 *http.Server
+	parcelService        service.ParcelService
+	carrierService       service.CarrierService
 }
 
-
-func NewServer(port string, parcelSvc service.ParcelService, cpAcceptService service.CarrierAcceptService) *server {
+func NewServer(port string, parcelSvc service.ParcelService, carrierSvc service.CarrierService) *server {
 	s := &server{
-		listenAddress: port,
-		parcelService: parcelSvc,
-		carrierAcceptService: cpAcceptService,
+		listenAddress:        port,
+		parcelService:        parcelSvc,
+		carrierService:       carrierSvc,
 	}
 	s.http = &http.Server{
 		Addr:    port,
@@ -37,7 +34,10 @@ func (s *server) route() *mux.Router {
 	apiRoute := r.PathPrefix("/api/v1").Subrouter()
 	r.Methods(http.MethodGet).Path("/ping").HandlerFunc(s.pingHandler)
 	apiRoute.HandleFunc("/parcel/{id}/accept", s.parcelCarrierAccept).Methods(http.MethodPost)
-	apiRoute.HandleFunc("/parcel", s.createParcel).Methods(http.MethodPost)
+	//apiRoute.HandleFunc("/parcel", s.createParcel).Methods(http.MethodPost)
+	apiRoute.HandleFunc("/parcel", s.newParcel).Methods(http.MethodPost)
+	apiRoute.HandleFunc("/parcel/{id}/request", s.addCarrierRequest).Methods(http.MethodPost)
+	apiRoute.HandleFunc("/parcel/{id}", s.getParcel).Methods(http.MethodGet)
 	return r
 }
 

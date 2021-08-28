@@ -6,14 +6,20 @@ import (
 	svc "parcel-service/internal/app/service"
 	"time"
 )
+
 type service struct {
-	repo svc.CarrierAcceptRepository
+	repo svc.CarrierRepository
 }
 
-func NewService(repo svc.CarrierAcceptRepository) *service {
+func NewService(repo svc.CarrierRepository) *service {
 	return &service{
 		repo: repo,
 	}
+}
+
+// Add a new carrier request to
+func (s *service) NewCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error {
+	return s.repo.InsertCarrierRequest(ctx, carrierReq)
 }
 
 func (s *service) AssignCarrierToParcel(ctx context.Context, parcel model.CarrierRequest) error {

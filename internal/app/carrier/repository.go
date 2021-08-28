@@ -3,19 +3,22 @@ package carrier
 import (
 	"context"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"parcel-service/internal/app/model"
 	"time"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
+
 // sql query and error
 const (
 	errUniqueViolation = pq.ErrorCode("23505")
-	updateAcceptQuery = `UPDATE carrier_request SET status = $1 WHERE parcel_id = $2 AND carrier_id = $3`
-	updateRejectQuery = `UPDATE carrier_request SET status = $1 WHERE parcel_id = $2 AND carrier_id != $3`
+	updateAcceptQuery  = `UPDATE carrier_request SET status = $1 WHERE parcel_id = $2 AND carrier_id = $3`
+	updateRejectQuery  = `UPDATE carrier_request SET status = $1 WHERE parcel_id = $2 AND carrier_id != $3`
 	updateParcelStatus = `UPDATE parcel SET carrier_id = $1, status = $2, source_time = $3 WHERE id = $4`
+	insertCarrierQuery = `INSERT INTO carrier_request (carrier_id, parcel_id) VALUES ($1, $2)`
 )
 
 type repository struct {
@@ -27,6 +30,16 @@ func NewRepository(db *sqlx.DB) *repository {
 	return &repository{
 		db: db,
 	}
+}
+
+func (r *repository) InsertCarrierRequest(ctx context.Context, request model.CarrierRequest) error {
+	if _, err := r.db.ExecContext(ctx, insertCarrierQuery, request.CarrierID, request.ParcelID); err != nil {
+		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
+			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
+		}
+		return err
+	}
+	return nil
 }
 
 func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.CarrierRequest, acceptStatus int, rejectStatus int, parcelStatus int, sourceTime time.Time) error {
@@ -60,7 +73,7 @@ func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.Carr
 		}
 		return err
 	}
-	if err=tx.Commit();err!=nil{
+	if err = tx.Commit(); err != nil {
 		tx.Rollback()
 		log.Error().Err(err).Msg("[UpdateCarrierRequest] failed to commit transaction")
 		return fmt.Errorf("%v :%w", err, model.ErrTransaction)
