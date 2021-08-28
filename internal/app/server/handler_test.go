@@ -329,7 +329,7 @@ func TestGetPercels(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			s := NewServer(":8080", tc.mockParcelSvc())
+			s := NewServer(":8080", tc.mockParcelSvc(), nil)
 
 			w := httptest.NewRecorder()
 			body := strings.NewReader("")

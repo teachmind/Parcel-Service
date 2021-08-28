@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"parcel-service/internal/app/model"
-	"parcel-service/internal/app/service/mocks"
+	mock_service "parcel-service/internal/app/service/mocks"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -23,14 +23,14 @@ func TestService_NewCarrierRequest(t *testing.T) {
 	testCases := []struct {
 		desc     string
 		payload  model.CarrierRequest
-		mockRepo func() *mocks.MockCarrierRequestRepository
+		mockRepo func() *mock_service.MockCarrierRepository
 		expErr   error
 	}{
 		{
 			desc:    "should return success",
 			payload: addReqPayload,
-			mockRepo: func() *mocks.MockCarrierRequestRepository {
-				r := mocks.NewMockCarrierRequestRepository(ctrl)
+			mockRepo: func() *mock_service.MockCarrierRepository {
+				r := mock_service.NewMockCarrierRepository(ctrl)
 				r.EXPECT().InsertCarrierRequest(gomock.Any(), gomock.Any()).Return(nil)
 				return r
 			},
@@ -40,8 +40,8 @@ func TestService_NewCarrierRequest(t *testing.T) {
 		{
 			desc:    "should return db error",
 			payload: addReqPayload,
-			mockRepo: func() *mocks.MockCarrierRequestRepository {
-				r := mocks.NewMockCarrierRequestRepository(ctrl)
+			mockRepo: func() *mock_service.MockCarrierRepository {
+				r := mock_service.NewMockCarrierRepository(ctrl)
 				r.EXPECT().InsertCarrierRequest(gomock.Any(), gomock.Any()).Return(errors.New("db-error"))
 				return r
 			},
