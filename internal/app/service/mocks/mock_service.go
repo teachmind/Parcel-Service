@@ -35,6 +35,21 @@ func (m *MockParcelRepository) EXPECT() *MockParcelRepositoryMockRecorder {
 	return m.recorder
 }
 
+// FetchParcelByID mocks base method.
+func (m *MockParcelRepository) FetchParcelByID(ctx context.Context, parcelID int) (model.Parcel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchParcelByID", ctx, parcelID)
+	ret0, _ := ret[0].(model.Parcel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchParcelByID indicates an expected call of FetchParcelByID.
+func (mr *MockParcelRepositoryMockRecorder) FetchParcelByID(ctx, parcelID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchParcelByID", reflect.TypeOf((*MockParcelRepository)(nil).FetchParcelByID), ctx, parcelID)
+}
+
 // GetParcelsList mocks base method.
 func (m *MockParcelRepository) GetParcelsList(ctx context.Context, status, limit, offset int) ([]model.Parcel, error) {
 	m.ctrl.T.Helper()
@@ -101,6 +116,21 @@ func (mr *MockParcelServiceMockRecorder) CreateParcel(ctx, parcel interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateParcel", reflect.TypeOf((*MockParcelService)(nil).CreateParcel), ctx, parcel)
 }
 
+// GetParcelByID mocks base method.
+func (m *MockParcelService) GetParcelByID(ctx context.Context, parcelID int) (model.Parcel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetParcelByID", ctx, parcelID)
+	ret0, _ := ret[0].(model.Parcel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetParcelByID indicates an expected call of GetParcelByID.
+func (mr *MockParcelServiceMockRecorder) GetParcelByID(ctx, parcelID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParcelByID", reflect.TypeOf((*MockParcelService)(nil).GetParcelByID), ctx, parcelID)
+}
+
 // GetParcels mocks base method.
 func (m *MockParcelService) GetParcels(ctx context.Context, status, limit, offset int) ([]model.Parcel, error) {
 	m.ctrl.T.Helper()
@@ -114,4 +144,78 @@ func (m *MockParcelService) GetParcels(ctx context.Context, status, limit, offse
 func (mr *MockParcelServiceMockRecorder) GetParcels(ctx, status, limit, offset interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParcels", reflect.TypeOf((*MockParcelService)(nil).GetParcels), ctx, status, limit, offset)
+}
+
+// MockCarrierRepository is a mock of CarrierRepository interface.
+type MockCarrierRepository struct {
+	ctrl     *gomock.Controller
+	recorder *MockCarrierRepositoryMockRecorder
+}
+
+// MockCarrierRepositoryMockRecorder is the mock recorder for MockCarrierRepository.
+type MockCarrierRepositoryMockRecorder struct {
+	mock *MockCarrierRepository
+}
+
+// NewMockCarrierRepository creates a new mock instance.
+func NewMockCarrierRepository(ctrl *gomock.Controller) *MockCarrierRepository {
+	mock := &MockCarrierRepository{ctrl: ctrl}
+	mock.recorder = &MockCarrierRepositoryMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCarrierRepository) EXPECT() *MockCarrierRepositoryMockRecorder {
+	return m.recorder
+}
+
+// InsertCarrierRequest mocks base method.
+func (m *MockCarrierRepository) InsertCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InsertCarrierRequest", ctx, carrierReq)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InsertCarrierRequest indicates an expected call of InsertCarrierRequest.
+func (mr *MockCarrierRepositoryMockRecorder) InsertCarrierRequest(ctx, carrierReq interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertCarrierRequest", reflect.TypeOf((*MockCarrierRepository)(nil).InsertCarrierRequest), ctx, carrierReq)
+}
+
+// MockCarrierService is a mock of CarrierService interface.
+type MockCarrierService struct {
+	ctrl     *gomock.Controller
+	recorder *MockCarrierServiceMockRecorder
+}
+
+// MockCarrierServiceMockRecorder is the mock recorder for MockCarrierService.
+type MockCarrierServiceMockRecorder struct {
+	mock *MockCarrierService
+}
+
+// NewMockCarrierService creates a new mock instance.
+func NewMockCarrierService(ctrl *gomock.Controller) *MockCarrierService {
+	mock := &MockCarrierService{ctrl: ctrl}
+	mock.recorder = &MockCarrierServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCarrierService) EXPECT() *MockCarrierServiceMockRecorder {
+	return m.recorder
+}
+
+// NewCarrierRequest mocks base method.
+func (m *MockCarrierService) NewCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewCarrierRequest", ctx, carrierReq)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewCarrierRequest indicates an expected call of NewCarrierRequest.
+func (mr *MockCarrierServiceMockRecorder) NewCarrierRequest(ctx, carrierReq interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewCarrierRequest", reflect.TypeOf((*MockCarrierService)(nil).NewCarrierRequest), ctx, carrierReq)
 }

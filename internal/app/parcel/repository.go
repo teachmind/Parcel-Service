@@ -2,18 +2,21 @@ package parcel
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"parcel-service/internal/app/model"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"github.com/rs/zerolog/log"
 )
 
 // SQL Query and error
 const (
-	errUniqueViolation = pq.ErrorCode("23505")
-	insertParcelQuery  = `INSERT INTO parcel (user_id, carrier_id, source_address, destination_address, source_time, type, price, carrier_fee, company_fee) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
-	getParcelListQuery = `SELECT * FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3`
+	errUniqueViolation   = pq.ErrorCode("23505")
+	getParcelListQuery   = `SELECT * FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3`
+	insertParcelQuery    = `INSERT INTO parcel (user_id, source_address, destination_address, source_time, type, price, carrier_fee, company_fee) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	fetchParcelByIDQuery = `SELECT * FROM parcel WHERE id = $1`
 )
 
 type repository struct {
@@ -28,9 +31,16 @@ func NewRepository(db *sqlx.DB) *repository {
 }
 
 func (r *repository) InsertParcel(ctx context.Context, parcel model.Parcel) error {
-	// actualPhone := RMCodeAndSpace(user.PhoneNumber)
-	fmt.Print(parcel.CarrierFee)
-	if _, err := r.db.ExecContext(ctx, insertParcelQuery, parcel.UserID, 1, parcel.SourceAddress, parcel.DestinationAddress, parcel.SourceTime, parcel.ParcelType, 200.0, 180.0, 20.0); err != nil {
+	if _, err := r.db.ExecContext(ctx,
+		insertParcelQuery,
+		parcel.UserID,
+		parcel.SourceAddress,
+		parcel.DestinationAddress,
+		parcel.SourceTime,
+		parcel.ParcelType,
+		parcel.Price,
+		parcel.CarrierFee,
+		parcel.CompanyFee); err != nil {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
 			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
 		}
@@ -50,4 +60,19 @@ func (r *repository) GetParcelsList(ctx context.Context, status int, limit int, 
 	}
 	fmt.Println(parcels)
 	return parcels, nil
+}
+
+func (r *repository) FetchParcelByID(ctx context.Context, parcelID int) (model.Parcel, error) {
+	var parcel model.Parcel
+
+	if err := r.db.GetContext(ctx, &parcel, fetchParcelByIDQuery, parcelID); err != nil {
+		if err == sql.ErrNoRows {
+			log.Error().Err(err).Msgf("[FetchParcelByID] failed to fetch parcel Error: %v", err)
+			return model.Parcel{}, fmt.Errorf("parcel %d is not found. :%w", parcelID, model.ErrNotFound)
+		}
+
+		return model.Parcel{}, err
+	}
+
+	return parcel, nil
 }

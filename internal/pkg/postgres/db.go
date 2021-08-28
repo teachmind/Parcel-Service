@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang-migrate/migrate/v4"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -12,6 +13,7 @@ const (
 	defaultMacIleConn      = 10
 	defaultMaxOpenConn     = 10
 	defaultConnMaxLifetime = 30 * time.Minute
+	defaultMigrationPath   = "file://./migrations"
 )
 
 type Config struct {
@@ -23,11 +25,10 @@ type Config struct {
 	MaxIdleConn              int
 	MaxOpenConn              int
 	ConnMacLifeTimeInMinutes int
+	MigrationPath            string
 }
 
 func New(conf *Config) (*sqlx.DB, error) {
-	println(conf.Url())
-
 	db, err := sqlx.Connect("postgres", conf.Url())
 	if err != nil {
 		return nil, err
@@ -37,6 +38,13 @@ func New(conf *Config) (*sqlx.DB, error) {
 	db.SetConnMaxLifetime(conf.connMaxLifeTime())
 
 	return db, nil
+}
+
+func (c *Config) migrationPath() string {
+	if c.MigrationPath == "" {
+		return defaultMigrationPath
+	}
+	return c.MigrationPath
 }
 
 func (c *Config) Url() string {
@@ -67,4 +75,32 @@ func (c *Config) connMaxLifeTime() time.Duration {
 		return defaultConnMaxLifetime
 	}
 	return time.Duration(c.ConnMacLifeTimeInMinutes) * time.Minute
+}
+
+func RunDatabaseMigration(conf *Config) error {
+	m, err := migrate.New(conf.migrationPath(), conf.Url())
+	if err != nil {
+		return err
+	}
+
+	if err = m.Up(); err != nil {
+		if err != migrate.ErrNoChange {
+			return err
+		}
+	}
+	return nil
+}
+
+func RollbackLatestMigration(config *Config) error {
+	m, err := migrate.New(config.migrationPath(), config.Url())
+	if err != nil {
+		return err
+	}
+
+	if err = m.Steps(-1); err != nil {
+		if err != migrate.ErrNoChange {
+			return err
+		}
+	}
+	return nil
 }

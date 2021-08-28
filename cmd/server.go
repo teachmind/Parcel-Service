@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 	"os/signal"
+	"parcel-service/internal/app/carrier"
 	"parcel-service/internal/app/parcel"
 	"parcel-service/internal/app/server"
 	"parcel-service/internal/pkg/postgres"
@@ -24,13 +25,13 @@ var serverCmd = &cobra.Command{
 			Password: os.Getenv("DB_PASSWORD"),
 			Name:     os.Getenv("DB_NAME"),
 		})
-		println(db)
 
 		if err != nil {
 			panic(err)
 		}
 		s := server.NewServer(os.Getenv("APP_PORT"),
 			parcel.NewService(parcel.NewRepository(db)),
+			carrier.NewService(carrier.NewRepository(db)),
 		)
 
 		sig := make(chan os.Signal, 1)
