@@ -17,14 +17,6 @@ var serverCmd = &cobra.Command{
 	Short: "Start server",
 	Long:  `Start server`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-
-		os.Setenv("APP_PORT", ":8080")
-		os.Setenv("DB_HOST", "localhost")
-		os.Setenv("DB_PORT", "5432")
-		os.Setenv("DB_USER", "bongo")
-		os.Setenv("DB_PASSWORD", "")
-		os.Setenv("DB_NAME", "parcelsrv")
-
 		db, err := postgres.New(&postgres.Config{
 			Host:     os.Getenv("DB_HOST"),
 			Port:     os.Getenv("DB_PORT"),

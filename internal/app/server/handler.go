@@ -9,8 +9,10 @@ import (
 )
 
 func (s *server) getParcelList(w http.ResponseWriter, r *http.Request) {
-	status := r.URL.Query().Get("status")
-	fmt.Printf(status)
+	status, err := strconv.Atoi(r.URL.Query().Get("status"))
+	if err == nil {
+		fmt.Printf("%d", status)
+	}
 	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
 	if err == nil {
 		fmt.Printf("%d", offset)
@@ -20,7 +22,7 @@ func (s *server) getParcelList(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("%d", limit)
 	}
 
-	parcel, err := s.parcelService.GetParcels(r.Context(), limit, offset)
+	parcel, err := s.parcelService.GetParcels(r.Context(), status, limit, offset)
 	if err != nil {
 		// if errors.Is(err, model.ErrInvalid) {
 		// 	ErrInvalidEntityResponse(w, "invalid parcel", err)

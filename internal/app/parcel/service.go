@@ -23,8 +23,8 @@ func (s *service) CreateParcel(ctx context.Context, parcel model.Parcel) error {
 }
 
 // get Parcel List
-func (s *service) GetParcels(ctx context.Context, limit int, offset int) ([]model.Parcel, error) {
-	parcel, err := s.repo.SelectParcelsList(ctx, limit, offset)
+func (s *service) GetParcels(ctx context.Context, status int, limit int, offset int) ([]model.Parcel, error) {
+	parcel, err := s.repo.GetParcelsList(ctx, status, limit, offset)
 
 	if err != nil {
 		return nil, err
