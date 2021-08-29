@@ -95,3 +95,35 @@ func (s *server) getParcel(w http.ResponseWriter, r *http.Request) {
 
 	SuccessResponse(w, http.StatusOK, parcel)
 }
+
+func (s *server) editParcel(w http.ResponseWriter, r *http.Request) {
+	var data model.Parcel
+	vars := mux.Vars(r)
+
+	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
+		ErrUnprocessableEntityResponse(w, "Decode Error", err)
+		return
+	}
+
+	parcelID, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		ErrInvalidEntityResponse(w, "Invalid Parcel ID", err)
+		return
+	}
+
+	data.ID = parcelID
+
+	if err := s.parcelService.EditParcel(r.Context(), data); err != nil {
+		if errors.Is(err, model.ErrInvalid) || errors.Is(err, model.ErrNotFound) {
+			ErrInvalidEntityResponse(w, "invalid Request", err)
+			return
+		}
+
+		log.Error().Err(err).Msgf("[parcel/{id}/request] failed to update parcel: %v", err)
+		ErrInternalServerResponse(w, "failed to update parcel", err)
+		return
+	}
+	
+	SuccessResponse(w, http.StatusCreated, "Success")
+}

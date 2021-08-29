@@ -36,6 +36,7 @@ func (s *server) route() *mux.Router {
 	apiRoute.HandleFunc("/parcel", s.newParcel).Methods(http.MethodPost)
 	apiRoute.HandleFunc("/parcel/{id}/request", s.addCarrierRequest).Methods(http.MethodPost)
 	apiRoute.HandleFunc("/parcel/{id}", s.getParcel).Methods(http.MethodGet)
+	apiRoute.HandleFunc("/parcel/{id}", s.editParcel).Methods(http.MethodPut)
 	return r
 }
 
