@@ -51,14 +51,13 @@ func (r *repository) InsertParcel(ctx context.Context, parcel model.Parcel) erro
 
 func (r *repository) GetParcelsList(ctx context.Context, status int, limit int, offset int) ([]model.Parcel, error) {
 	var parcels []model.Parcel
-	//r.db.Select(&parcels, getParcelListQuery)
-	if err := r.db.Select(&parcels, getParcelListQuery, status, limit, offset); err != nil {
-		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
-			return nil, fmt.Errorf("%v :%w", err, model.ErrInvalid)
+	if err := r.db.GetContext(ctx, &parcels, getParcelListQuery, status, limit, offset); err != nil {
+		if err == sql.ErrNoRows {
+			log.Error().Err(err).Msgf("[GetParcelsList] failed to fetch parcel list Error: %v", err)
+			return []model.Parcel{}, fmt.Errorf("parcel list for offset %d is not found. :%w", offset, model.ErrNotFound)
 		}
-		return nil, err
+		return []model.Parcel{}, err
 	}
-	fmt.Println(parcels)
 	return parcels, nil
 }
 

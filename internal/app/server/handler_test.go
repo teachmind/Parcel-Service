@@ -300,7 +300,7 @@ func TestGetPercels(t *testing.T) {
 			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid character '-' in numeric literal","message_title":"Decode Error","severity":"error"}],"data":null}`,
 		},
 		{
-			desc:   "should return invalid parcel error",
+			desc:   "should return no parcel list found",
 			status: 1,
 			offset: 2,
 			limit:  4,
@@ -309,7 +309,7 @@ func TestGetPercels(t *testing.T) {
 				s.EXPECT().GetParcels(gomock.Any(), 1, 2, 4).Return(model.ErrInvalid)
 				return s
 			},
-			expStatusCode: http.StatusBadRequest,
+			expStatusCode: http.StatusNotFound,
 			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid","message_title":"invalid parcel","severity":"error"}],"data":null}`,
 		},
 		{
@@ -333,7 +333,7 @@ func TestGetPercels(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			body := strings.NewReader("")
-			r := httptest.NewRequest(http.MethodGet, "/api/v1/parcel/"+strconv.Itoa(tc.status)+strconv.Itoa(tc.offset)+strconv.Itoa(tc.limit), body)
+			r := httptest.NewRequest(http.MethodGet, "/api/v1/parcel?status="+strconv.Itoa(tc.status)+"&offset="+strconv.Itoa(tc.offset)+"&limit="+strconv.Itoa(tc.limit), body)
 
 			router := mux.NewRouter()
 			router.Methods(http.MethodGet).Path("/api/v1/parcel/").Queries("status", "offset", "limit").HandlerFunc(s.getParcelList)

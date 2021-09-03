@@ -2,7 +2,7 @@
 // Source: internal/app/service/service.go
 
 // Package mock_service is a generated GoMock package.
-package mock_service
+package mocks
 
 import (
 	context "context"

@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"parcel-service/internal/app/model"
 	"strconv"
@@ -14,27 +13,24 @@ import (
 
 func (s *server) getParcelList(w http.ResponseWriter, r *http.Request) {
 	status, err := strconv.Atoi(r.URL.Query().Get("status"))
-	if err == nil {
-		fmt.Printf("%d", status)
+	if err != nil {
+		ErrInvalidEntityResponse(w, "Invalid status value", err)
+		return
 	}
 	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
-	if err == nil {
-		fmt.Printf("%d", offset)
+	if err != nil {
+		ErrInvalidEntityResponse(w, "Invalid offset value", err)
+		return
 	}
 	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
-	if err == nil {
-		fmt.Printf("%d", limit)
+	if err != nil {
+		ErrInvalidEntityResponse(w, "Invalid limit value", err)
+		return
 	}
 
 	parcel, err := s.parcelService.GetParcels(r.Context(), status, limit, offset)
 	if err != nil {
-		// if errors.Is(err, model.ErrInvalid) {
-		// 	ErrInvalidEntityResponse(w, "invalid parcel", err)
-		// 	return
-		// }
-		fmt.Print(err)
-		log.Error().Err(err).Msgf("[parcel/{id}] failed to parcel '%d': %v", nil, err)
-		// ErrInternalServerResponse(w, "failed to create parcel", err)
+		log.Error().Err(err).Msgf("getParcelList is failed to get parecels", nil, err)
 		return
 	}
 	SuccessResponse(w, http.StatusCreated, parcel)
