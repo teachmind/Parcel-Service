@@ -4,8 +4,6 @@ import (
 	"context"
 	"parcel-service/internal/app/model"
 	svc "parcel-service/internal/app/service"
-
-	"github.com/rs/zerolog/log"
 )
 
 type service struct {
@@ -19,14 +17,7 @@ func NewService(repo svc.ParcelRepository) *service {
 }
 
 func (s *service) GetParcels(ctx context.Context, status int, limit int, offset int) ([]model.Parcel, error) {
-	parcels, err := s.repo.GetParcelsList(ctx, status, limit, offset)
-
-	if err != nil {
-		log.Error().Err(err).Msgf("[GetParcels] failed to get parcel list Error: %v", err)
-		return []model.Parcel{}, err
-	}
-
-	return parcels, err
+	return s.repo.GetParcelsList(ctx, status, limit, offset)
 }
 
 func (s *service) CreateParcel(ctx context.Context, parcel model.Parcel) error {
@@ -43,12 +34,9 @@ func (s *service) CreateParcel(ctx context.Context, parcel model.Parcel) error {
 }
 
 func (s *service) GetParcelByID(ctx context.Context, parcelID int) (model.Parcel, error) {
-	parcel, err := s.repo.FetchParcelByID(ctx, parcelID)
+	return s.repo.FetchParcelByID(ctx, parcelID)
+}
 
-	if err != nil {
-		log.Error().Err(err).Msgf("[GetParcelByID] failed to get parcel Error: %v", err)
-		return model.Parcel{}, err
-	}
-
-	return parcel, nil
+func (s *service) EditParcel(ctx context.Context, parcel model.Parcel) error {
+	return s.repo.UpdateParcel(ctx, parcel)
 }

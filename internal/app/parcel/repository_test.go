@@ -193,3 +193,90 @@ func TestRepository_FetchParcelByID(t *testing.T) {
 		assert.EqualError(t, err, "sql-error")
 	})
 }
+
+func TestRepository_UpdateParcel(t *testing.T) {
+	parcel := model.Parcel{
+		ID:                 1,
+		UserID:             1,
+		SourceAddress:      "Dhaka Bangladesh",
+		DestinationAddress: "Pabna Shadar",
+		SourceTime:         time.Now(),
+		ParcelType:         "Document",
+		Price:              200.0,
+		CarrierFee:         180.0,
+		CompanyFee:         20.0,
+		Status:             2,
+		CreatedAt:          time.Now(),
+		UpdatedAt:          time.Now(),
+	}
+
+	t.Run("should return success", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectExec("UPDATE parcel SET (.+) WHERE (.+)").
+			WithArgs(parcel.Status, parcel.ID).
+			WillReturnResult(sqlmock.NewResult(1, 1))
+
+		repo := NewRepository(sqlxDB)
+		err := repo.UpdateParcel(context.Background(), parcel)
+		assert.Nil(t, err)
+	})
+
+	t.Run("should return invalid ID", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectExec("UPDATE parcel SET (.+) WHERE (.+)").
+			WithArgs(parcel.Status, parcel.ID).
+			WillReturnResult(sqlmock.NewResult(1, 0))
+
+		repo := NewRepository(sqlxDB)
+		err := repo.UpdateParcel(context.Background(), parcel)
+		assert.True(t, errors.Is(err, model.ErrNotFound))
+	})
+
+	t.Run("should return rows error", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectExec("UPDATE parcel SET (.+) WHERE (.+)").
+			WithArgs(parcel.Status, parcel.ID).
+			WillReturnResult(sqlmock.NewErrorResult(model.ErrInvalid))
+
+		repo := NewRepository(sqlxDB)
+		err := repo.UpdateParcel(context.Background(), parcel)
+		assert.True(t, errors.Is(err, model.ErrInvalid))
+	})
+
+	t.Run("should return unique key violation error", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectExec("UPDATE parcel SET (.+) WHERE (.+)").
+			WithArgs().
+			WillReturnError(&pq.Error{Code: "23505"})
+
+		repo := NewRepository(sqlxDB)
+		err := repo.UpdateParcel(context.Background(), parcel)
+		assert.True(t, errors.Is(err, model.ErrInvalid))
+	})
+
+	t.Run("should return sql error", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectExec("UPDATE parcel SET (.+) WHERE (.+)").
+			WithArgs().
+			WillReturnError(errors.New("sql-error"))
+
+		repo := NewRepository(sqlxDB)
+		err := repo.UpdateParcel(context.Background(), parcel)
+		assert.EqualError(t, err, "sql-error")
+	})
+}

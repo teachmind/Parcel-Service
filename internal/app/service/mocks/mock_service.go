@@ -79,6 +79,20 @@ func (mr *MockParcelRepositoryMockRecorder) InsertParcel(ctx, parcel interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertParcel", reflect.TypeOf((*MockParcelRepository)(nil).InsertParcel), ctx, parcel)
 }
 
+// UpdateParcel mocks base method.
+func (m *MockParcelRepository) UpdateParcel(ctx context.Context, parcel model.Parcel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateParcel", ctx, parcel)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateParcel indicates an expected call of UpdateParcel.
+func (mr *MockParcelRepositoryMockRecorder) UpdateParcel(ctx, parcel interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateParcel", reflect.TypeOf((*MockParcelRepository)(nil).UpdateParcel), ctx, parcel)
+}
+
 // MockParcelService is a mock of ParcelService interface.
 type MockParcelService struct {
 	ctrl     *gomock.Controller
@@ -116,6 +130,20 @@ func (mr *MockParcelServiceMockRecorder) CreateParcel(ctx, parcel interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateParcel", reflect.TypeOf((*MockParcelService)(nil).CreateParcel), ctx, parcel)
 }
 
+// EditParcel mocks base method.
+func (m *MockParcelService) EditParcel(ctx context.Context, parcel model.Parcel) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "EditParcel", ctx, parcel)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// EditParcel indicates an expected call of EditParcel.
+func (mr *MockParcelServiceMockRecorder) EditParcel(ctx, parcel interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EditParcel", reflect.TypeOf((*MockParcelService)(nil).EditParcel), ctx, parcel)
+}
+
 // GetParcelByID mocks base method.
 func (m *MockParcelService) GetParcelByID(ctx context.Context, parcelID int) (model.Parcel, error) {
 	m.ctrl.T.Helper()
@@ -146,6 +174,11 @@ func (mr *MockParcelServiceMockRecorder) GetParcels(ctx, status, limit, offset i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParcels", reflect.TypeOf((*MockParcelService)(nil).GetParcels), ctx, status, limit, offset)
 }
 
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCarrierRepository) EXPECT() *MockCarrierRepositoryMockRecorder {
+	return m.recorder
+}
+
 // MockCarrierRepository is a mock of CarrierRepository interface.
 type MockCarrierRepository struct {
 	ctrl     *gomock.Controller
@@ -162,11 +195,6 @@ func NewMockCarrierRepository(ctrl *gomock.Controller) *MockCarrierRepository {
 	mock := &MockCarrierRepository{ctrl: ctrl}
 	mock.recorder = &MockCarrierRepositoryMockRecorder{mock}
 	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCarrierRepository) EXPECT() *MockCarrierRepositoryMockRecorder {
-	return m.recorder
 }
 
 // InsertCarrierRequest mocks base method.

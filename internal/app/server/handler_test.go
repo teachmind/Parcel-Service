@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"parcel-service/internal/app/model"
-	mock_service "parcel-service/internal/app/service/mocks"
+	"parcel-service/internal/app/service/mocks"
 	"strconv"
 	"strings"
 	"testing"
@@ -24,15 +24,15 @@ func TestNewParcel(t *testing.T) {
 	testCases := []struct {
 		desc          string
 		payload       string
-		mockParcelSvc func() *mock_service.MockParcelService
+		mockParcelSvc func() *mocks.MockParcelService
 		expStatusCode int
 		expResponse   string
 	}{
 		{
 			desc:    "should success",
 			payload: payload,
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().CreateParcel(gomock.Any(), gomock.Any()).Return(nil)
 				return s
 			},
@@ -42,8 +42,8 @@ func TestNewParcel(t *testing.T) {
 		{
 			desc:    "should return decode error",
 			payload: `------------`,
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				return mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				return mocks.NewMockParcelService(ctrl)
 			},
 			expStatusCode: http.StatusUnprocessableEntity,
 			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid character '-' in numeric literal","message_title":"Decode Error","severity":"error"}],"data":null}`,
@@ -51,8 +51,8 @@ func TestNewParcel(t *testing.T) {
 		{
 			desc:    "should return invalid parcel error",
 			payload: payload,
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().CreateParcel(gomock.Any(), gomock.Any()).Return(model.ErrInvalid)
 				return s
 			},
@@ -62,8 +62,8 @@ func TestNewParcel(t *testing.T) {
 		{
 			desc:    "should return internal server error",
 			payload: payload,
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().CreateParcel(gomock.Any(), gomock.Any()).Return(errors.New("server-error"))
 				return s
 			},
@@ -107,15 +107,15 @@ func TestGetParcel(t *testing.T) {
 
 	testCases := []struct {
 		desc          string
-		mockParcelSvc func() *mock_service.MockParcelService
+		mockParcelSvc func() *mocks.MockParcelService
 		parcelID      string
 		expStatusCode int
 		expResponse   string
 	}{
 		{
 			desc: "should success",
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().GetParcelByID(gomock.Any(), 1).Return(parcel, nil)
 				return s
 			},
@@ -125,8 +125,8 @@ func TestGetParcel(t *testing.T) {
 		},
 		{
 			desc: "should return ID not exist",
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().GetParcelByID(gomock.Any(), 1).Return(model.Parcel{}, model.ErrInvalid)
 				return s
 			},
@@ -136,8 +136,8 @@ func TestGetParcel(t *testing.T) {
 		},
 		{
 			desc: "should return internal server error",
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().GetParcelByID(gomock.Any(), 1).
 					Return(model.Parcel{}, errors.New("server-error"))
 				return s
@@ -148,8 +148,8 @@ func TestGetParcel(t *testing.T) {
 		},
 		{
 			desc: "should return internal server error",
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().GetParcelByID(gomock.Any(), 1).
 					Return(model.Parcel{}, model.ErrNotFound)
 				return s
@@ -160,8 +160,8 @@ func TestGetParcel(t *testing.T) {
 		},
 		{
 			desc: "should return invalid parcel ID",
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				return s
 			},
 			parcelID:      "__",
@@ -196,15 +196,15 @@ func TestAddCarrierRequest(t *testing.T) {
 	testCases := []struct {
 		desc           string
 		payload        string
-		mockCarrierSvc func() *mock_service.MockCarrierService
+		mockCarrierSvc func() *mocks.MockCarrierService
 		expStatusCode  int
 		expResponse    string
 	}{
 		{
 			desc:    "should success",
 			payload: payload,
-			mockCarrierSvc: func() *mock_service.MockCarrierService {
-				s := mock_service.NewMockCarrierService(ctrl)
+			mockCarrierSvc: func() *mocks.MockCarrierService {
+				s := mocks.NewMockCarrierService(ctrl)
 				s.EXPECT().NewCarrierRequest(gomock.Any(), gomock.Any()).Return(nil)
 				return s
 			},
@@ -214,8 +214,8 @@ func TestAddCarrierRequest(t *testing.T) {
 		{
 			desc:    "should return decode error",
 			payload: `------------`,
-			mockCarrierSvc: func() *mock_service.MockCarrierService {
-				return mock_service.NewMockCarrierService(ctrl)
+			mockCarrierSvc: func() *mocks.MockCarrierService {
+				return mocks.NewMockCarrierService(ctrl)
 			},
 			expStatusCode: http.StatusUnprocessableEntity,
 			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid character '-' in numeric literal","message_title":"Decode Error","severity":"error"}],"data":null}`,
@@ -223,8 +223,8 @@ func TestAddCarrierRequest(t *testing.T) {
 		{
 			desc:    "should return invalid request error",
 			payload: payload,
-			mockCarrierSvc: func() *mock_service.MockCarrierService {
-				s := mock_service.NewMockCarrierService(ctrl)
+			mockCarrierSvc: func() *mocks.MockCarrierService {
+				s := mocks.NewMockCarrierService(ctrl)
 				s.EXPECT().NewCarrierRequest(gomock.Any(), gomock.Any()).Return(model.ErrInvalid)
 				return s
 			},
@@ -234,8 +234,8 @@ func TestAddCarrierRequest(t *testing.T) {
 		{
 			desc:    "should return internal server error",
 			payload: payload,
-			mockCarrierSvc: func() *mock_service.MockCarrierService {
-				s := mock_service.NewMockCarrierService(ctrl)
+			mockCarrierSvc: func() *mocks.MockCarrierService {
+				s := mocks.NewMockCarrierService(ctrl)
 				s.EXPECT().NewCarrierRequest(gomock.Any(), gomock.Any()).Return(errors.New("server-error"))
 				return s
 			},
@@ -271,7 +271,7 @@ func TestGetPercels(t *testing.T) {
 		status        int
 		offset        int
 		limit         int
-		mockParcelSvc func() *mock_service.MockParcelService
+		mockParcelSvc func() *mocks.MockParcelService
 		expStatusCode int
 		expResponse   string
 	}{
@@ -280,8 +280,8 @@ func TestGetPercels(t *testing.T) {
 			status: 1,
 			offset: 2,
 			limit:  4,
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().GetParcels(gomock.Any(), 1, 2, 4).Return(nil)
 				return s
 			},
@@ -293,8 +293,8 @@ func TestGetPercels(t *testing.T) {
 			status: -1,
 			offset: 2,
 			limit:  4,
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				return mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				return mocks.NewMockParcelService(ctrl)
 			},
 			expStatusCode: http.StatusUnprocessableEntity,
 			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid character '-' in numeric literal","message_title":"Decode Error","severity":"error"}],"data":null}`,
@@ -304,8 +304,8 @@ func TestGetPercels(t *testing.T) {
 			status: 1,
 			offset: 2,
 			limit:  4,
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().GetParcels(gomock.Any(), 1, 2, 4).Return(model.ErrInvalid)
 				return s
 			},
@@ -317,8 +317,8 @@ func TestGetPercels(t *testing.T) {
 			status: 1,
 			offset: 2,
 			limit:  4,
-			mockParcelSvc: func() *mock_service.MockParcelService {
-				s := mock_service.NewMockParcelService(ctrl)
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
 				s.EXPECT().GetParcels(gomock.Any(), 1, 2, 4).Return(errors.New("server-error"))
 				return s
 			},
@@ -337,6 +337,79 @@ func TestGetPercels(t *testing.T) {
 
 			router := mux.NewRouter()
 			router.Methods(http.MethodGet).Path("/api/v1/parcel/").Queries("status", "offset", "limit").HandlerFunc(s.getParcelList)
+			router.ServeHTTP(w, r)
+			assert.Equal(t, tc.expStatusCode, w.Code)
+			assert.Equal(t, tc.expResponse, w.Body.String())
+		})
+	}
+}
+func TestEditParcel(t *testing.T) {
+	payload := `{ "status":1 }`
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	testCases := []struct {
+		desc          string
+		payload       string
+		mockParcelSvc func() *mocks.MockParcelService
+		expStatusCode int
+		expResponse   string
+	}{
+		{
+			desc:    "should success",
+			payload: payload,
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().EditParcel(gomock.Any(), gomock.Any()).Return(nil)
+				return s
+			},
+			expStatusCode: http.StatusCreated,
+			expResponse:   `{"success":true,"errors":null,"data":"Success"}`,
+		},
+		{
+			desc:    "should return decode error",
+			payload: `------------`,
+			mockParcelSvc: func() *mocks.MockParcelService {
+				return mocks.NewMockParcelService(ctrl)
+			},
+			expStatusCode: http.StatusUnprocessableEntity,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid character '-' in numeric literal","message_title":"Decode Error","severity":"error"}],"data":null}`,
+		},
+		{
+			desc:    "should return invalid request error",
+			payload: payload,
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().EditParcel(gomock.Any(), gomock.Any()).Return(model.ErrInvalid)
+				return s
+			},
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid","message_title":"invalid Request","severity":"error"}],"data":null}`,
+		},
+		{
+			desc:    "should return internal server error",
+			payload: payload,
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().EditParcel(gomock.Any(), gomock.Any()).Return(errors.New("server-error"))
+				return s
+			},
+			expStatusCode: http.StatusInternalServerError,
+			expResponse:   `{"success":false,"errors":[{"code":"SERVER_ERROR","message":"server-error","message_title":"failed to update parcel","severity":"error"}],"data":null}`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			s := NewServer(":8080", tc.mockParcelSvc(), nil)
+
+			w := httptest.NewRecorder()
+			body := strings.NewReader(tc.payload)
+			r := httptest.NewRequest(http.MethodPut, "/api/v1/parcel/1", body)
+			r = mux.SetURLVars(r, map[string]string{"id": "1"})
+
+			router := mux.NewRouter()
+			router.Methods(http.MethodPut).Path("/api/v1/parcel/{id}").HandlerFunc(s.editParcel)
 			router.ServeHTTP(w, r)
 			assert.Equal(t, tc.expStatusCode, w.Code)
 			assert.Equal(t, tc.expResponse, w.Body.String())
