@@ -46,37 +46,26 @@ func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.Carr
 	//starting db transaction
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		log.Error().Err(err).Msg("[UpdateCarrierStatus] has failed to begin transactions.")
-		return fmt.Errorf("%v :%w", err, model.ErrTransaction)
+		log.Error().Err(err).Msg("[UpdateCarrierStatus] Internal Server Error.")
+		return fmt.Errorf("%v :%w", err, model.IntServerErr)
 	}
 	//accept status update for carrier request table
 	if _, err = tx.ExecContext(ctx, updateAcceptQuery, acceptStatus, parcel.ParcelID, parcel.CarrierID); err != nil {
 		tx.Rollback()
-		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
-			log.Error().Err(err).Msg("[UpdateCarrierRequest] has failed to update status of carrier_rquest table to accept.")
-			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
-		}
 		return err
 	}
 	if _, err := tx.ExecContext(ctx, updateRejectQuery, rejectStatus, parcel.ParcelID, parcel.CarrierID); err != nil {
 		tx.Rollback()
-		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
-			log.Error().Err(err).Msg("[UpdateCarrierRequest] has failed to update reject status for carrier_request table.")
-			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
-		}
 		return err
 	}
 	if _, err := tx.ExecContext(ctx, updateParcelStatus, parcel.CarrierID, parcelStatus, sourceTime, parcel.ParcelID); err != nil {
 		tx.Rollback()
-		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
-			return fmt.Errorf("%v :%w", err, model.ErrInvalid)
-		}
 		return err
 	}
 	if err = tx.Commit(); err != nil {
 		tx.Rollback()
-		log.Error().Err(err).Msg("[UpdateCarrierRequest] failed to commit transaction")
-		return fmt.Errorf("%v :%w", err, model.ErrTransaction)
+		log.Error().Err(err).Msg("[UpdateCarrierRequest] Internal Server Error.")
+		return fmt.Errorf("%v :%w", err, model.IntServerErr)
 	}
 	return nil
 }

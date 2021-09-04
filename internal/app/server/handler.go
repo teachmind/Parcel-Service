@@ -122,7 +122,7 @@ func (s *server) parcelCarrierAccept(w http.ResponseWriter, r *http.Request) {
 			ErrInvalidEntityResponse(w, "invalid Request", err)
 			return
 		}
-		log.Error().Err(err).Msgf("[parcel/{id}/accept] failed to assign carrier to parcel: %v", err)
+		log.Error().Err(err).Msgf("[parcelCarrierAccept] failed to assign carrier to parcel: %v", err)
 		ErrInternalServerResponse(w, "failed to assign carrier to parcel", err)
 		return
 	}

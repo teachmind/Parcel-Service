@@ -28,10 +28,6 @@ type CarrierRequest struct {
 	Status    int `json:"status" db:"status"`
 }
 
-type Statuses struct {
-	AcceptStatus, RejectStatus,  ParcelStatus int
-}
-
 func (p *Parcel) ValidateParcelInput() error {
 	if p.SourceAddress == "" {
 		return fmt.Errorf("source Address is required :%w", ErrEmpty)

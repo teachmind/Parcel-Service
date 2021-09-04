@@ -108,30 +108,15 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		assert.True(t, errors.Is(err, nil))
 	})
 
-	t.Run("should return begin transaction failed", func(t *testing.T) {
+	t.Run("should return internal server error.", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectBegin().WillReturnError(model.ErrTransaction)
+		m.ExpectBegin().WillReturnError(model.IntServerErr)
 
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
-		assert.True(t, errors.Is(err, model.ErrTransaction))
-	})
-
-	t.Run("UpdateAcceptQuery should return unique key violation error", func(t *testing.T) {
-		db, m, _ := sqlmock.New()
-		defer db.Close()
-
-		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectBegin()
-		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.AcceptStatus, parcel.ParcelID, parcel.CarrierID).
-			WillReturnError(&pq.Error{Code: "23505"})
-
-		repo := NewRepository(sqlxDB)
-		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
-		assert.True(t, errors.Is(err, model.ErrInvalid))
+		assert.True(t, errors.Is(err, model.IntServerErr))
 	})
 
 	t.Run("UpdateAcceptQuery should return sql-error", func(t *testing.T) {
@@ -149,23 +134,6 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 
-	t.Run("updateRejectQuery should return unique key violation error", func(t *testing.T) {
-		db, m, _ := sqlmock.New()
-		defer db.Close()
-
-		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectBegin()
-		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.AcceptStatus, parcel.ParcelID, parcel.CarrierID).
-			WillReturnResult(sqlmock.NewResult(1, 1))
-		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.RejectStatus, parcel.ParcelID, parcel.CarrierID).
-			WillReturnError(&pq.Error{Code: "23505"})
-
-		repo := NewRepository(sqlxDB)
-		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
-		assert.True(t, errors.Is(err, model.ErrInvalid))
-	})
 
 	t.Run("updateRejectQuery should return sql-error", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
@@ -183,27 +151,6 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
 		assert.NotNil(t, err)
-	})
-
-	t.Run("updateParcelStatus should return unique key violation error", func(t *testing.T) {
-		db, m, _ := sqlmock.New()
-		defer db.Close()
-
-		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectBegin()
-		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.AcceptStatus, parcel.ParcelID, parcel.CarrierID).
-			WillReturnResult(sqlmock.NewResult(1, 1))
-		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.RejectStatus, parcel.ParcelID, parcel.CarrierID).
-			WillReturnResult(sqlmock.NewResult(1, 1))
-		m.ExpectExec("UPDATE parcel SET (.+) WHERE (.+)").
-			WithArgs(parcel.CarrierID, statuses.ParcelStatus, sourceTime, parcel.ParcelID).
-			WillReturnError(&pq.Error{Code: "23505"})
-
-		repo := NewRepository(sqlxDB)
-		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
-		assert.True(t, errors.Is(err, model.ErrInvalid))
 	})
 
 	t.Run("updateParcelStatus should return sql-error", func(t *testing.T) {
@@ -242,10 +189,10 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 			WithArgs(parcel.CarrierID, statuses.ParcelStatus, sourceTime, parcel.ParcelID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
-		m.ExpectCommit().WillReturnError(model.ErrTransaction)
+		m.ExpectCommit().WillReturnError(model.IntServerErr)
 
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
-		assert.True(t, errors.Is(err, model.ErrTransaction))
+		assert.True(t, errors.Is(err, model.IntServerErr))
 	})
 }
