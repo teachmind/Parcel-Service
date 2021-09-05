@@ -80,11 +80,7 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		Status:    1,
 	}
 
-	statuses := model.Statuses{
-		ParcelStatus: 2,
-		AcceptStatus: 2,
-		RejectStatus: 3,
-	}
+	const acceptStatus, rejectStatus, parcelStatus int = 2, 3, 2
 
 	t.Run("should return success", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
@@ -93,18 +89,18 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectBegin()
 		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.AcceptStatus, parcel.ParcelID, parcel.CarrierID).
+			WithArgs(acceptStatus, parcel.ParcelID, parcel.CarrierID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.RejectStatus, parcel.ParcelID, parcel.CarrierID).
+			WithArgs(rejectStatus, parcel.ParcelID, parcel.CarrierID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		m.ExpectExec("UPDATE parcel SET (.+) WHERE (.+)").
-			WithArgs(parcel.CarrierID, statuses.ParcelStatus, sourceTime, parcel.ParcelID).
+			WithArgs(parcel.CarrierID, parcelStatus, sourceTime, parcel.ParcelID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		m.ExpectCommit()
 
 		repo := NewRepository(sqlxDB)
-		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
+		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
 		assert.True(t, errors.Is(err, nil))
 	})
 
@@ -115,7 +111,7 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		m.ExpectBegin().WillReturnError(model.IntServerErr)
 
 		repo := NewRepository(sqlxDB)
-		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
+		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
 		assert.True(t, errors.Is(err, model.IntServerErr))
 	})
 
@@ -126,11 +122,11 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectBegin()
 		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.AcceptStatus, parcel.ParcelID, parcel.CarrierID).
+			WithArgs(acceptStatus, parcel.ParcelID, parcel.CarrierID).
 			WillReturnError(errors.New("sql-error"))
 
 		repo := NewRepository(sqlxDB)
-		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
+		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
 		assert.NotNil(t, err)
 	})
 
@@ -142,14 +138,14 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectBegin()
 		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.AcceptStatus, parcel.ParcelID, parcel.CarrierID).
+			WithArgs(acceptStatus, parcel.ParcelID, parcel.CarrierID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.RejectStatus, parcel.ParcelID, parcel.CarrierID).
+			WithArgs(rejectStatus, parcel.ParcelID, parcel.CarrierID).
 			WillReturnError(errors.New("sql-error"))
 
 		repo := NewRepository(sqlxDB)
-		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
+		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
 		assert.NotNil(t, err)
 	})
 
@@ -160,17 +156,17 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectBegin()
 		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.AcceptStatus, parcel.ParcelID, parcel.CarrierID).
+			WithArgs(acceptStatus, parcel.ParcelID, parcel.CarrierID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.RejectStatus, parcel.ParcelID, parcel.CarrierID).
+			WithArgs(rejectStatus, parcel.ParcelID, parcel.CarrierID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		m.ExpectExec("UPDATE parcel SET (.+) WHERE (.+)").
-			WithArgs(parcel.CarrierID, statuses.ParcelStatus, sourceTime, parcel.ParcelID).
+			WithArgs(parcel.CarrierID, parcelStatus, sourceTime, parcel.ParcelID).
 			WillReturnError(errors.New("sql-error"))
 
 		repo := NewRepository(sqlxDB)
-		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
+		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
 		assert.NotNil(t, err)
 	})
 
@@ -180,19 +176,19 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectBegin()
 		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.AcceptStatus, parcel.ParcelID, parcel.CarrierID).
+			WithArgs(acceptStatus, parcel.ParcelID, parcel.CarrierID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
-			WithArgs(statuses.RejectStatus, parcel.ParcelID, parcel.CarrierID).
+			WithArgs(rejectStatus, parcel.ParcelID, parcel.CarrierID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 		m.ExpectExec("UPDATE parcel SET (.+) WHERE (.+)").
-			WithArgs(parcel.CarrierID, statuses.ParcelStatus, sourceTime, parcel.ParcelID).
+			WithArgs(parcel.CarrierID, parcelStatus, sourceTime, parcel.ParcelID).
 			WillReturnResult(sqlmock.NewResult(1, 1))
 
 		m.ExpectCommit().WillReturnError(model.IntServerErr)
 
 		repo := NewRepository(sqlxDB)
-		err := repo.UpdateCarrierRequest(context.Background(), parcel, statuses.AcceptStatus, statuses.RejectStatus, statuses.ParcelStatus, sourceTime)
+		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
 		assert.True(t, errors.Is(err, model.IntServerErr))
 	})
 }
