@@ -11,12 +11,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var addReqPayload = model.CarrierRequest{
-	CarrierID: 1,
-	ParcelID:  1,
-}
-
 func TestService_NewCarrierRequest(t *testing.T) {
+	addReqPayload := model.CarrierRequest{
+		CarrierID: 1,
+		ParcelID:  1,
+	}
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
