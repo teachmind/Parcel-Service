@@ -101,10 +101,10 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
-		assert.True(t, errors.Is(err, nil))
+		assert.Nil(t, err)
 	})
 
-	t.Run("should return internal server error.", func(t *testing.T) {
+	t.Run("should return internal server error", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
@@ -112,10 +112,10 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
-		assert.True(t, errors.Is(err, model.IntServerErr))
+		assert.EqualError(t, err, "internal server error")
 	})
 
-	t.Run("UpdateAcceptQuery should return sql-error", func(t *testing.T) {
+	t.Run("UpdateAcceptQuery should return sql-error to update carrier_request table for accepting", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 
@@ -127,11 +127,11 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
-		assert.NotNil(t, err)
+		assert.EqualError(t, err, "sql-error")
 	})
 
 
-	t.Run("updateRejectQuery should return sql-error", func(t *testing.T) {
+	t.Run("updateRejectQuery should return sql-error to update carrier_request table for rejecting", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 
@@ -146,10 +146,10 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
-		assert.NotNil(t, err)
+		assert.EqualError(t, err, "sql-error")
 	})
 
-	t.Run("updateParcelStatus should return sql-error", func(t *testing.T) {
+	t.Run("updateParcelStatus should return sql-error to update parcel table with parcel status", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 
@@ -167,7 +167,7 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
-		assert.NotNil(t, err)
+		assert.EqualError(t, err, "sql-error")
 	})
 
 	t.Run("should return commit failed", func(t *testing.T) {

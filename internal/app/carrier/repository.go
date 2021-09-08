@@ -47,19 +47,22 @@ func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.Carr
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
 		log.Error().Err(err).Msg("[UpdateCarrierStatus] Internal Server Error.")
-		return fmt.Errorf("%v :%w", err, model.IntServerErr)
+		return fmt.Errorf("%v", err)
 	}
 	//accept status update for carrier request table
 	if _, err = tx.ExecContext(ctx, updateAcceptQuery, acceptStatus, parcel.ParcelID, parcel.CarrierID); err != nil {
 		tx.Rollback()
+		log.Error().Err(err).Msgf("[UpdateCarrierStatus] failed to update carrier_request table to accept: %v", err)
 		return err
 	}
 	if _, err := tx.ExecContext(ctx, updateRejectQuery, rejectStatus, parcel.ParcelID, parcel.CarrierID); err != nil {
 		tx.Rollback()
+		log.Error().Err(err).Msgf("[UpdateCarrierStatus] failed to update carrier_request table to reject: %v", err)
 		return err
 	}
 	if _, err := tx.ExecContext(ctx, updateParcelStatus, parcel.CarrierID, parcelStatus, sourceTime, parcel.ParcelID); err != nil {
 		tx.Rollback()
+		log.Error().Err(err).Msgf("[UpdateCarrierStatus] failed to update parcel table to update status: %v", err)
 		return err
 	}
 	if err = tx.Commit(); err != nil {
