@@ -209,7 +209,7 @@ func TestService_GetParcelByID(t *testing.T) {
 			expParcel: model.Parcel{},
 		},
 		{
-			desc:     "should return empty parcel",
+			desc:     "should return empty parcel list",
 			parcelID: 1,
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)

@@ -52,10 +52,10 @@ func (r *repository) InsertParcel(ctx context.Context, parcel model.Parcel) erro
 
 func (r *repository) GetParcelsList(ctx context.Context, status int, limit int, offset int) ([]model.Parcel, error) {
 	var parcels []model.Parcel
-	if err := r.db.GetContext(ctx, &parcels, getParcelListQuery, status, limit, offset); err != nil {
+	if err := r.db.SelectContext(ctx, &parcels, getParcelListQuery, status, limit, offset); err != nil {
 		if err == sql.ErrNoRows {
 			log.Error().Err(err).Msgf("[GetParcelsList] failed to fetch parcel list Error: %v", err)
-			return []model.Parcel{}, fmt.Errorf("parcel list for offset %d is not found. :%w", offset, model.ErrNotFound)
+			return []model.Parcel{}, fmt.Errorf("parcel list for offset %d is not found. :%w", offset, sql.ErrNoRows)
 		}
 		return []model.Parcel{}, err
 	}

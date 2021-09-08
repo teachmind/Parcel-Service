@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"parcel-service/internal/app/model"
 	"parcel-service/internal/app/service/mocks"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -266,64 +265,81 @@ func TestGetPercels(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	parcels := []model.Parcel{
+		{
+			UserID:             1,
+			Status:             1,
+			SourceAddress:      "Dhaka Bangladesh",
+			DestinationAddress: "Pabna Shadar",
+			SourceTime:         time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+			ParcelType:         "Document",
+			Price:              200.0,
+			CarrierFee:         180.0,
+			CompanyFee:         20.0,
+			CreatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+			UpdatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+		}, {
+			UserID:             2,
+			Status:             1,
+			SourceAddress:      "Dhaka Bangladesh",
+			DestinationAddress: "Pabna Shadar",
+			SourceTime:         time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+			ParcelType:         "Document",
+			Price:              200.0,
+			CarrierFee:         180.0,
+			CompanyFee:         20.0,
+			CreatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+			UpdatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+		},
+	}
+
 	testCases := []struct {
 		desc          string
-		status        int
-		offset        int
-		limit         int
 		mockParcelSvc func() *mocks.MockParcelService
+		status        string
+		offset        string
+		limit         string
 		expStatusCode int
 		expResponse   string
 	}{
 		{
-			desc:   "should success",
-			status: 1,
-			offset: 2,
-			limit:  4,
+			desc: "should success",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcels(gomock.Any(), 1, 2, 4).Return(nil)
+				s.EXPECT().GetParcels(gomock.Any(), 1, 2, 0).Return(parcels, nil)
 				return s
 			},
-			expStatusCode: http.StatusCreated,
-			expResponse:   `{"success":true,"errors":null,"data":"successful"}`,
+			status:        "1",
+			offset:        "0",
+			limit:         "2",
+			expStatusCode: http.StatusOK,
+			expResponse:   `{"success":true,"errors":null,"data":[{"id":0,"user_id":1,"carrier_id":0,"status":1,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2020-04-11T21:34:01Z","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"2020-04-11T21:34:01Z","updated_at":"2020-04-11T21:34:01Z"},{"id":0,"user_id":2,"carrier_id":0,"status":1,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2020-04-11T21:34:01Z","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"2020-04-11T21:34:01Z","updated_at":"2020-04-11T21:34:01Z"}]}`,
 		},
 		{
-			desc:   "should return decode error",
-			status: -1,
-			offset: 2,
-			limit:  4,
-			mockParcelSvc: func() *mocks.MockParcelService {
-				return mocks.NewMockParcelService(ctrl)
-			},
-			expStatusCode: http.StatusUnprocessableEntity,
-			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid character '-' in numeric literal","message_title":"Decode Error","severity":"error"}],"data":null}`,
-		},
-		{
-			desc:   "should return no parcel list found",
-			status: 1,
-			offset: 2,
-			limit:  4,
+			desc: "should return empty parcel list",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcels(gomock.Any(), 1, 2, 4).Return(model.ErrInvalid)
+				s.EXPECT().GetParcels(gomock.Any(), 0, 2, 0).Return(nil, nil)
 				return s
 			},
-			expStatusCode: http.StatusNotFound,
-			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid","message_title":"invalid parcel","severity":"error"}],"data":null}`,
+			status:        "0",
+			offset:        "0",
+			limit:         "2",
+			expStatusCode: http.StatusOK,
+			expResponse:   `{"success":true,"errors":null,"data":null}`,
 		},
 		{
-			desc:   "should return internal server error",
-			status: 1,
-			offset: 2,
-			limit:  4,
+			desc: "should return internal server error",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcels(gomock.Any(), 1, 2, 4).Return(errors.New("server-error"))
+				s.EXPECT().GetParcels(gomock.Any(), 1, 2, -1).Return([]model.Parcel{}, errors.New("pq: OFFSET must not be negative"))
 				return s
 			},
+			status:        "1",
+			offset:        "-1",
+			limit:         "2",
 			expStatusCode: http.StatusInternalServerError,
-			expResponse:   `{"success":false,"errors":[{"code":"SERVER_ERROR","message":"server-error","message_title":"failed to create parcel","severity":"error"}],"data":null}`,
+			expResponse:   `{"success":false,"errors":[{"code":"SERVER_ERROR","message":"pq: OFFSET must not be negative","message_title":"Failed to fetch parcel list for given query params","severity":"error"}],"data":null}`,
 		},
 	}
 
@@ -333,10 +349,10 @@ func TestGetPercels(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			body := strings.NewReader("")
-			r := httptest.NewRequest(http.MethodGet, "/api/v1/parcel?status="+strconv.Itoa(tc.status)+"&offset="+strconv.Itoa(tc.offset)+"&limit="+strconv.Itoa(tc.limit), body)
+			r := httptest.NewRequest(http.MethodGet, "/api/v1/parcel?status="+tc.status+"&offset="+tc.offset+"&limit="+tc.limit, body)
 
 			router := mux.NewRouter()
-			router.Methods(http.MethodGet).Path("/api/v1/parcel/").Queries("status", "offset", "limit").HandlerFunc(s.getParcelList)
+			router.Methods(http.MethodGet).Path("/api/v1/parcel").Queries("status", tc.status, "offset", tc.offset, "limit", tc.limit).HandlerFunc(s.getParcelList)
 			router.ServeHTTP(w, r)
 			assert.Equal(t, tc.expStatusCode, w.Code)
 			assert.Equal(t, tc.expResponse, w.Body.String())

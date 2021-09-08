@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"parcel-service/internal/app/model"
+	"regexp"
 	"testing"
 	"time"
 
@@ -77,7 +78,7 @@ func TestRepository_GetParcelsList(t *testing.T) {
 			ID:                 0,
 			UserID:             1,
 			CarrierID:          0,
-			Status:             0,
+			Status:             1,
 			SourceAddress:      "Dhaka Bangladesh",
 			DestinationAddress: "Pabna Shadar",
 			ParcelType:         "Document",
@@ -86,7 +87,9 @@ func TestRepository_GetParcelsList(t *testing.T) {
 			CompanyFee:         20,
 		}, {
 			ID:                 0,
-			UserID:             1,
+			UserID:             2,
+			CarrierID:          0,
+			Status:             1,
 			SourceAddress:      "Dhaka Bangladesh",
 			DestinationAddress: "Pabna Shadar",
 			ParcelType:         "Document",
@@ -100,15 +103,33 @@ func TestRepository_GetParcelsList(t *testing.T) {
 		defer db.Close()
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+)").
-			WillReturnRows(sqlmock.NewRows([]string{"user_id", "source_address", "destination_address", "source_time", "type", "price", "carrier_fee", "company_fee", "created_at", "updated_at"}).
-				AddRow(parcels[0].UserID, parcels[0].SourceAddress, parcels[0].DestinationAddress, parcels[0].SourceTime, parcels[0].ParcelType, parcels[0].Price, parcels[0].CarrierFee, parcels[0].CompanyFee, parcels[0].CreatedAt, parcels[0].UpdatedAt).AddRow(parcels[1].UserID, parcels[1].SourceAddress, parcels[1].DestinationAddress, parcels[1].SourceTime, parcels[1].ParcelType, parcels[1].Price, parcels[1].CarrierFee, parcels[1].CompanyFee, parcels[1].CreatedAt, parcels[1].UpdatedAt))
+
+		m.ExpectQuery(regexp.QuoteMeta("SELECT * FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3")).
+			WillReturnRows(sqlmock.NewRows([]string{"user_id", "status", "source_address", "destination_address", "type", "price", "carrier_fee", "company_fee"}).
+				AddRow(parcels[0].UserID, parcels[0].Status, parcels[0].SourceAddress, parcels[0].DestinationAddress, parcels[0].ParcelType, parcels[0].Price, parcels[0].CarrierFee, parcels[0].CompanyFee).
+				AddRow(parcels[1].UserID, parcels[1].Status, parcels[1].SourceAddress, parcels[1].DestinationAddress, parcels[1].ParcelType, parcels[1].Price, parcels[1].CarrierFee, parcels[1].CompanyFee))
 
 		repo := NewRepository(sqlxDB)
-		result, err := repo.GetParcelsList(context.Background(), 1, 2, 4)
+		result, err := repo.GetParcelsList(context.Background(), 1, 2, 0)
 
 		assert.Nil(t, err)
 		assert.EqualValues(t, parcels, result)
+	})
+
+	t.Run("should return success with 0 rows", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+)").
+			WithArgs(0, 0, 0).
+			WillReturnRows(sqlmock.NewRows([]string{}))
+
+		repo := NewRepository(sqlxDB)
+		res, err := repo.GetParcelsList(context.Background(), 0, 0, 0)
+
+		assert.Empty(t, res)
+		assert.Nil(t, err)
 	})
 
 	t.Run("should return no rows error", func(t *testing.T) {
@@ -117,24 +138,13 @@ func TestRepository_GetParcelsList(t *testing.T) {
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
 		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+)").
-			WithArgs(3).
+			WithArgs(0, 0, -1).
 			WillReturnError(sql.ErrNoRows)
-		repo := NewRepository(sqlxDB)
-		_, err := repo.GetParcelsList(context.Background(), 0, 0, 0)
-		assert.True(t, errors.Is(err, model.ErrNotFound))
-	})
 
-	t.Run("should return error", func(t *testing.T) {
-		db, m, _ := sqlmock.New()
-		defer db.Close()
-
-		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+)").
-			WithArgs(3).
-			WillReturnError(errors.New("sql-error"))
 		repo := NewRepository(sqlxDB)
-		_, err := repo.GetParcelsList(context.Background(), 0, 0, 0)
-		assert.EqualError(t, err, "sql-error")
+		_, err := repo.GetParcelsList(context.Background(), 0, 0, -1)
+
+		assert.EqualError(t, err, "parcel list for offset -1 is not found. :"+sql.ErrNoRows.Error())
 	})
 }
 

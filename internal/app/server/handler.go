@@ -28,12 +28,17 @@ func (s *server) getParcelList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	parcel, err := s.parcelService.GetParcels(r.Context(), status, limit, offset)
+	parcels, err := s.parcelService.GetParcels(r.Context(), status, limit, offset)
 	if err != nil {
-		log.Error().Err(err).Msgf("getParcelList is failed to get parecels", nil, err)
+		if errors.Is(err, model.ErrInvalid) || errors.Is(err, model.ErrNotFound) {
+			ErrInvalidEntityResponse(w, "No data exist for these query parmas", err)
+			return
+		}
+		log.Error().Err(err).Msgf("[getParcelList] failed to get parcels for '%d', '%d', '%d': %v", status, limit, offset, err)
+		ErrInternalServerResponse(w, "Failed to fetch parcel list for given query params", err)
 		return
 	}
-	SuccessResponse(w, http.StatusCreated, parcel)
+	SuccessResponse(w, http.StatusOK, parcels)
 }
 
 func (s *server) newParcel(w http.ResponseWriter, r *http.Request) {
@@ -149,6 +154,6 @@ func (s *server) editParcel(w http.ResponseWriter, r *http.Request) {
 		ErrInternalServerResponse(w, "failed to update parcel", err)
 		return
 	}
-	
+
 	SuccessResponse(w, http.StatusCreated, "Success")
 }
