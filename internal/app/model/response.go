@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -9,7 +8,6 @@ var ErrNotFound = fmt.Errorf("not found")
 var ErrInvalid = fmt.Errorf("invalid")
 var ErrEmpty = fmt.Errorf("empty")
 var IntServerErr = fmt.Errorf("internal server error")
-var ErrUnauthorized = errors.New("access denied")
 
 type GenericResponse struct {
 	Success bool                   `json:"success"`

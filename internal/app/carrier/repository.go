@@ -67,7 +67,7 @@ func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.Carr
 	}
 	if err = tx.Commit(); err != nil {
 		tx.Rollback()
-		log.Error().Err(err).Msg("[UpdateCarrierRequest] Internal Server Error.")
+		log.Error().Err(err).Msg("[UpdateCarrierRequest] Failed to commit")
 		return fmt.Errorf("%v :%w", err, model.IntServerErr)
 	}
 	return nil
