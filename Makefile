@@ -30,7 +30,7 @@ rollback: build
 	@echo "> running rollback command"
 	@${APP_EXECUTABLE} rollback
 
-run: build
+server: build
 	@echo "> running server command"
 	@${APP_EXECUTABLE} server
 
