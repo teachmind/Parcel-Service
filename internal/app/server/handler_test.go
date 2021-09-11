@@ -92,6 +92,7 @@ func TestGetParcel(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	parcel := model.Parcel{
+		ID:                 1,
 		UserID:             1,
 		SourceAddress:      "Dhaka Bangladesh",
 		DestinationAddress: "Pabna Shadar",
@@ -115,18 +116,18 @@ func TestGetParcel(t *testing.T) {
 			desc: "should success",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcelByID(gomock.Any(), 1).Return(parcel, nil)
+				s.EXPECT().GetParcelByID(gomock.Any(), parcel.ID).Return(parcel, nil)
 				return s
 			},
 			parcelID:      "1",
 			expStatusCode: http.StatusOK,
-			expResponse:   `{"success":true,"errors":null,"data":{"id":0,"user_id":1,"carrier_id":0,"status":0,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2020-04-11T21:34:01Z","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"2020-04-11T21:34:01Z","updated_at":"2020-04-11T21:34:01Z"}}`,
+			expResponse:   `{"success":true,"errors":null,"data":{"id":1,"user_id":1,"carrier_id":0,"status":0,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2020-04-11T21:34:01Z","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"2020-04-11T21:34:01Z","updated_at":"2020-04-11T21:34:01Z"}}`,
 		},
 		{
 			desc: "should return ID not exist",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcelByID(gomock.Any(), 1).Return(model.Parcel{}, model.ErrInvalid)
+				s.EXPECT().GetParcelByID(gomock.Any(), parcel.ID).Return(model.Parcel{}, model.ErrInvalid)
 				return s
 			},
 			parcelID:      "1",
@@ -137,7 +138,7 @@ func TestGetParcel(t *testing.T) {
 			desc: "should return internal server error",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcelByID(gomock.Any(), 1).
+				s.EXPECT().GetParcelByID(gomock.Any(), parcel.ID).
 					Return(model.Parcel{}, errors.New("server-error"))
 				return s
 			},
@@ -146,15 +147,15 @@ func TestGetParcel(t *testing.T) {
 			expResponse:   `{"success":false,"errors":[{"code":"SERVER_ERROR","message":"server-error","message_title":"Failed to fetch parcel 1","severity":"error"}],"data":null}`,
 		},
 		{
-			desc: "should return internal server error",
+			desc: "should return not found error",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcelByID(gomock.Any(), 1).
+				s.EXPECT().GetParcelByID(gomock.Any(), parcel.ID).
 					Return(model.Parcel{}, model.ErrNotFound)
 				return s
 			},
 			parcelID:      "1",
-			expStatusCode: http.StatusBadRequest,
+			expStatusCode: http.StatusNotFound,
 			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"not found","message_title":"This ID does not exist.","severity":"error"}],"data":null}`,
 		},
 		{
@@ -265,6 +266,10 @@ func TestGetPercels(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	statusArray := map[string]int{"statusOne": 1, "statusTwo": 0, "statusThree": 1}
+	limitArray := map[string]int{"limitOne": 2, "limitTwo": 2, "limitThree": 2}
+	offsetArray := map[string]int{"offsetOne": 0, "offsetTwo": 0, "offsetThree": -1}
+
 	parcels := []model.Parcel{
 		{
 			UserID:             1,
@@ -306,7 +311,7 @@ func TestGetPercels(t *testing.T) {
 			desc: "should success",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcels(gomock.Any(), 1, 2, 0).Return(parcels, nil)
+				s.EXPECT().GetParcels(gomock.Any(), statusArray["statusOne"], limitArray["limitOne"], offsetArray["offsetOne"]).Return(parcels, nil)
 				return s
 			},
 			status:        "1",
@@ -319,7 +324,7 @@ func TestGetPercels(t *testing.T) {
 			desc: "should return empty parcel list",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcels(gomock.Any(), 0, 2, 0).Return(nil, nil)
+				s.EXPECT().GetParcels(gomock.Any(), statusArray["statusTwo"], limitArray["limitTwo"], offsetArray["offsetTwo"]).Return(nil, nil)
 				return s
 			},
 			status:        "0",
@@ -332,7 +337,7 @@ func TestGetPercels(t *testing.T) {
 			desc: "should return internal server error",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcels(gomock.Any(), 1, 2, -1).Return([]model.Parcel{}, errors.New("pq: OFFSET must not be negative"))
+				s.EXPECT().GetParcels(gomock.Any(), statusArray["statusThree"], limitArray["limitThree"], offsetArray["offsetThree"]).Return([]model.Parcel{}, errors.New("pq: OFFSET must not be negative"))
 				return s
 			},
 			status:        "1",

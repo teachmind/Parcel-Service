@@ -114,7 +114,12 @@ func (s *server) getParcel(w http.ResponseWriter, r *http.Request) {
 	parcel, err := s.parcelService.GetParcelByID(r.Context(), data.ID)
 
 	if err != nil {
-		if errors.Is(err, model.ErrInvalid) || errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, model.ErrInvalid) {
+			ErrInvalidEntityResponse(w, "This ID does not exist.", err)
+			return
+		}
+		if errors.Is(err, model.ErrNotFound) {
+			w.WriteHeader(http.StatusNotFound)
 			ErrInvalidEntityResponse(w, "This ID does not exist.", err)
 			return
 		}

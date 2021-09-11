@@ -14,7 +14,7 @@ import (
 // SQL Query and error
 const (
 	errUniqueViolation   = pq.ErrorCode("23505")
-	getParcelListQuery   = `SELECT * FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3`
+	getParcelListQuery   = `SELECT user_id, status, source_address, destination_address, type, price, carrier_fee, company_fee FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3`
 	insertParcelQuery    = `INSERT INTO parcel (user_id, source_address, destination_address, source_time, type, price, carrier_fee, company_fee) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 	fetchParcelByIDQuery = `SELECT * FROM parcel WHERE id = $1`
 	updateParcelQuery    = `UPDATE parcel SET status = $1 WHERE id = $2`

@@ -28,6 +28,10 @@ func TestService_GetParcels(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	status := 1
+	limit := 2
+	offset := 4
+
 	parcels := []model.Parcel{
 		{
 			ID:                 1,
@@ -67,7 +71,7 @@ func TestService_GetParcels(t *testing.T) {
 			limit:  4,
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)
-				r.EXPECT().GetParcelsList(gomock.Any(), 1, 2, 4).Return(parcels, nil)
+				r.EXPECT().GetParcelsList(gomock.Any(), status, limit, offset).Return(parcels, nil)
 				return r
 			},
 			expErr:    nil,
@@ -81,11 +85,11 @@ func TestService_GetParcels(t *testing.T) {
 			limit:  4,
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)
-				r.EXPECT().GetParcelsList(gomock.Any(), 1, 2, 4).Return([]model.Parcel{}, model.ErrNotFound)
+				r.EXPECT().GetParcelsList(gomock.Any(), status, limit, offset).Return([]model.Parcel{}, model.ErrNotFound)
 				return r
 			},
 			expErr:    model.ErrNotFound,
-			expParcel: []model.Parcel(nil),
+			expParcel: []model.Parcel{},
 		},
 		{
 			desc:   "should return DB error",
@@ -94,11 +98,11 @@ func TestService_GetParcels(t *testing.T) {
 			limit:  4,
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)
-				r.EXPECT().GetParcelsList(gomock.Any(), 1, 2, 4).Return([]model.Parcel{}, errors.New("db-error"))
+				r.EXPECT().GetParcelsList(gomock.Any(), status, limit, offset).Return([]model.Parcel{}, errors.New("db-error"))
 				return r
 			},
 			expErr:    errors.New("db-error"),
-			expParcel: []model.Parcel(nil),
+			expParcel: []model.Parcel{},
 		},
 		{
 			desc:   "should return empty parcel",
@@ -107,7 +111,7 @@ func TestService_GetParcels(t *testing.T) {
 			limit:  4,
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)
-				r.EXPECT().GetParcelsList(gomock.Any(), 1, 2, 4).Return([]model.Parcel{}, nil)
+				r.EXPECT().GetParcelsList(gomock.Any(), status, limit, offset).Return([]model.Parcel{}, nil)
 				return r
 			},
 			expErr:    nil,
@@ -118,7 +122,7 @@ func TestService_GetParcels(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			s := NewService(tc.mockRepo())
-			parcels, err := s.GetParcels(context.Background(), 1, 2, 4)
+			parcels, err := s.GetParcels(context.Background(), status, limit, offset)
 			assert.Equal(t, tc.expErr, err)
 			assert.EqualValues(t, tc.expParcel, parcels)
 		})
