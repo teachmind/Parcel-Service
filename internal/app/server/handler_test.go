@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"parcel-service/internal/app/model"
@@ -354,7 +355,8 @@ func TestGetPercels(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			body := strings.NewReader("")
-			r := httptest.NewRequest(http.MethodGet, "/api/v1/parcel?status="+tc.status+"&offset="+tc.offset+"&limit="+tc.limit, body)
+			path := fmt.Sprintf("/api/v1/parcel?status=%s&offset=%s&limit=%s", tc.status, tc.offset, tc.limit)
+			r := httptest.NewRequest(http.MethodGet, path, body)
 
 			router := mux.NewRouter()
 			router.Methods(http.MethodGet).Path("/api/v1/parcel").Queries("status", tc.status, "offset", tc.offset, "limit", tc.limit).HandlerFunc(s.getParcelList)
