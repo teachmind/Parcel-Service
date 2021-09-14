@@ -7,6 +7,7 @@ import (
 var ErrNotFound = fmt.Errorf("not found")
 var ErrInvalid = fmt.Errorf("invalid")
 var ErrEmpty = fmt.Errorf("empty")
+var IntServerErr = fmt.Errorf("internal server error")
 
 type GenericResponse struct {
 	Success bool                   `json:"success"`

@@ -1,10 +1,9 @@
-//go:generate mockgen -source=internal/app/service/service.go -destination=internal/app/service/mocks/mock_service.go
-
 package service
 
 import (
 	"context"
 	"parcel-service/internal/app/model"
+	"time"
 )
 
 // ParcelRepository to Insert New Parcel and get parcel list
@@ -25,8 +24,10 @@ type ParcelService interface {
 
 type CarrierRepository interface {
 	InsertCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error
+	UpdateCarrierRequest(ctx context.Context, parcel model.CarrierRequest, acceptStatus int, rejectStatus int, parcelStatus int, sourceTime time.Time) error
 }
 
 type CarrierService interface {
 	NewCarrierRequest(ctx context.Context, carrierReq model.CarrierRequest) error
+	AssignCarrierToParcel(ctx context.Context, parcel model.CarrierRequest) error
 }

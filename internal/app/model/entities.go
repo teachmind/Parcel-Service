@@ -28,13 +28,6 @@ type CarrierRequest struct {
 	Status    int `json:"status" db:"status"`
 }
 
-func (cr *CarrierRequest) ValidateCarrierId() error {
-	if cr.CarrierID == 0 {
-		return fmt.Errorf("Carrier ID is required :%w", ErrEmpty)
-	}
-	return nil
-}
-
 func (p *Parcel) ValidateParcelInput() error {
 	if p.SourceAddress == "" {
 		return fmt.Errorf("source Address is required :%w", ErrEmpty)
@@ -56,5 +49,13 @@ func (p *Parcel) ValidateParcelInput() error {
 		return fmt.Errorf("source time must be future date:%w", ErrEmpty)
 	}
 
+	return nil
+}
+
+// Validates carrier request input credentials
+func (cr *CarrierRequest) ValidateCarrierId() error {
+	if cr.CarrierID == 0 {
+		return fmt.Errorf("Carrier ID is required :%w", ErrEmpty)
+	}
 	return nil
 }

@@ -4,7 +4,7 @@ APP_EXECUTABLE="./build/$(APP)"
 APP_COMMIT=$(shell git rev-parse HEAD)
 ALL_PACKAGES=$(shell go list ./... | grep -v "vendor")
 SOURCE_DIRS=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-COVERAGE_MIN=65
+COVERAGE_MIN=90
 
 .PHONY: build
 
@@ -25,6 +25,14 @@ build:
 migrate: build
 	@echo "> running database migration"
 	@${APP_EXECUTABLE} migrate
+
+rollback: build
+	@echo "> running rollback command"
+	@${APP_EXECUTABLE} rollback
+
+server: build
+	@echo "> running server command"
+	@${APP_EXECUTABLE} server
 
 test:
 	@echo "> running test and creating coverage report"
