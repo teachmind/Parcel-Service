@@ -119,8 +119,7 @@ func (s *server) getParcel(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if errors.Is(err, model.ErrNotFound) {
-			w.WriteHeader(http.StatusNotFound)
-			ErrInvalidEntityResponse(w, "This ID does not exist.", err)
+			ErrNotFoundResponse(w, "This ID does not exist.", err)
 			return
 		}
 		log.Error().Err(err).Msgf("[getParcel] failed to parcel '%d': %v", data.ID, err)

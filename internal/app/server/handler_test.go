@@ -157,7 +157,7 @@ func TestGetParcel(t *testing.T) {
 			},
 			parcelID:      "1",
 			expStatusCode: http.StatusNotFound,
-			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"not found","message_title":"This ID does not exist.","severity":"error"}],"data":null}`,
+			expResponse:   `{"success":false,"errors":[{"code":"NOT FOUND","message":"not found","message_title":"This ID does not exist.","severity":"error"}],"data":null}`,
 		},
 		{
 			desc: "should return invalid parcel ID",

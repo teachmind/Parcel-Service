@@ -165,6 +165,22 @@ func TestRepository_GetParcelsList(t *testing.T) {
 
 		assert.EqualError(t, err, "parcel list for offset -1 is not found. :"+sql.ErrNoRows.Error())
 	})
+
+	t.Run("should return sql error", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+
+		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+)").
+			WillReturnError(errors.New("sql-error"))
+
+		repo := NewRepository(sqlxDB)
+		_, err := repo.GetParcelsList(context.Background(), status, limit, offset)
+
+		assert.EqualError(t, err, "sql-error")
+	})
+
 }
 
 func TestRepository_FetchParcelByID(t *testing.T) {
