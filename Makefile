@@ -26,6 +26,14 @@ migrate: build
 	@echo "> running database migration"
 	@${APP_EXECUTABLE} migrate
 
+rollback: build
+	@echo "> running rollback command"
+	@${APP_EXECUTABLE} rollback
+
+server: build
+	@echo "> running server command"
+	@${APP_EXECUTABLE} server
+
 test:
 	@echo "> running test and creating coverage report"
 	go test -race -p=1 -cover -coverprofile=coverage.txt -covermode=atomic $(ALL_PACKAGES)
