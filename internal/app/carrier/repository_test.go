@@ -115,7 +115,7 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		assert.EqualError(t, err, "internal server error")
 	})
 
-	t.Run("UpdateAcceptQuery should return sql-error to update carrier_request table for accepting", func(t *testing.T) {
+	t.Run("UpdateAcceptQuery should return sql-error to update carrier_request table for acceptance", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 
@@ -131,7 +131,7 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 	})
 
 
-	t.Run("updateRejectQuery should return sql-error to update carrier_request table for rejecting", func(t *testing.T) {
+	t.Run("updateRejectQuery should return sql-error to update carrier_request table for rejection", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 
