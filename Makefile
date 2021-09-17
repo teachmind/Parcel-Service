@@ -1,12 +1,21 @@
+include .env
+
 SHELL=/bin/bash
 APP=parcel-service
 APP_EXECUTABLE="./build/$(APP)"
 APP_COMMIT=$(shell git rev-parse HEAD)
 ALL_PACKAGES=$(shell go list ./... | grep -v "vendor")
 SOURCE_DIRS=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-COVERAGE_MIN=65
+COVERAGE_MIN=90
 
 .PHONY: build
+
+export  APP_PORT := ${APP_PORT}
+export  DB_PORT := ${DB_PORT}
+export  DB_USER := ${DB_USER}
+export  DB_PASSWORD := ${DB_PASSWORD}
+export  DB_HOST := ${DB_HOST}
+export  DB_NAME := ${DB_NAME}
 
 all: clean test
 
