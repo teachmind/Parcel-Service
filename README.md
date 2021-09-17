@@ -1,6 +1,5 @@
 # Parcel-Service
 
-[![Actions Status](https://github.com/teachmind/Parcel-Service/workflows/build/badge.svg)](https://github.com/teachmind/Parcel-Service/actions)
 [![codecov](https://codecov.io/gh/teachmind/Parcel-Service/branch/master/graph/badge.svg?token=HivKkjhfjl)](https://codecov.io/gh/teachmind/Parcel-Service)
 [![Go Report Card](https://goreportcard.com/badge/github.com/teachmind/Parcel-Service)](https://goreportcard.com/report/github.com/teachmind/Parcel-Service)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/934b654ea9eb4f72b98138b21b5aea94)](https://www.codacy.com/gh/teachmind/Parcel-Service/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=teachmind/Parcel-Service&amp;utm_campaign=Badge_Grade)
