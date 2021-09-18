@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"parcel-service/internal/app/model"
 	"regexp"
 	"testing"
@@ -163,7 +164,7 @@ func TestRepository_GetParcelsList(t *testing.T) {
 		repo := NewRepository(sqlxDB)
 		_, err := repo.GetParcelsList(context.Background(), status, limit, offset)
 
-		assert.EqualError(t, err, "parcel list for offset -1 is not found. :"+sql.ErrNoRows.Error())
+		assert.EqualError(t, err, fmt.Sprintf("parcel list for offset -1 is not found. :%s", sql.ErrNoRows.Error()))
 	})
 
 	t.Run("should return sql error", func(t *testing.T) {

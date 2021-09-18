@@ -55,9 +55,9 @@ func (r *repository) GetParcelsList(ctx context.Context, status int, limit int, 
 	if err := r.db.SelectContext(ctx, &parcels, getParcelListQuery, status, limit, offset); err != nil {
 		if err == sql.ErrNoRows {
 			log.Error().Err(err).Msgf("[GetParcelsList] failed to fetch parcel list Error: %v", err)
-			return []model.Parcel{}, fmt.Errorf("parcel list for offset %d is not found. :%w", offset, sql.ErrNoRows)
+			return nil, fmt.Errorf("parcel list for offset %d is not found. :%w", offset, sql.ErrNoRows)
 		}
-		return []model.Parcel{}, err
+		return nil, err
 	}
 	return parcels, nil
 }
