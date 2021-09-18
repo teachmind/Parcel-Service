@@ -90,6 +90,20 @@ func TestRepository_InsertParcel(t *testing.T) {
 		assert.EqualError(t, err, "sql-error")
 		assert.Equal(t, result, model.Parcel{})
 	})
+
+	t.Run("should return sql error", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectPrepare("INSERT INTO parcel (.+) VALUES (.+) RETURNING .+").
+			WillReturnError(&pq.Error{})
+
+		repo := NewRepository(sqlxDB)
+		result, err := repo.InsertParcel(context.Background(), parcel)
+		assert.EqualError(t, err, "pq: ")
+		assert.Equal(t, result, model.Parcel{})
+	})
 }
 
 func TestRepository_FetchParcelByID(t *testing.T) {
