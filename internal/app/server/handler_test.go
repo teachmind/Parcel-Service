@@ -395,6 +395,52 @@ func TestGetPercels(t *testing.T) {
 			expStatusCode: http.StatusInternalServerError,
 			expResponse:   `{"success":false,"errors":[{"code":"SERVER_ERROR","message":"pq: OFFSET must not be negative","message_title":"Failed to fetch parcel list for given query params","severity":"error"}],"data":null}`,
 		},
+		{
+			desc: "should return internal server error",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().GetParcels(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return([]model.Parcel{}, model.ErrInvalid)
+				return s
+			},
+			status:        "1",
+			offset:        "0",
+			limit:         "2",
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid","message_title":"No data exist for these query parmas","severity":"error"}],"data":null}`,
+		},
+		{
+			desc: "should return strconv error for status",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				return mocks.NewMockParcelService(ctrl)
+			},
+			status:        "invalid",
+			offset:        "2",
+			limit:         "0",
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"strconv.Atoi: parsing \"invalid\": invalid syntax","message_title":"Invalid status value","severity":"error"}],"data":null}`,
+		},
+		{
+			desc: "should return strconv error for limit",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				return mocks.NewMockParcelService(ctrl)
+			},
+			status:        "1",
+			offset:        "2",
+			limit:         "invalid",
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"strconv.Atoi: parsing \"invalid\": invalid syntax","message_title":"Invalid limit value","severity":"error"}],"data":null}`,
+		},
+		{
+			desc: "should return strconv error for offset",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				return mocks.NewMockParcelService(ctrl)
+			},
+			status:        "1",
+			offset:        "invalid",
+			limit:         "0",
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"strconv.Atoi: parsing \"invalid\": invalid syntax","message_title":"Invalid offset value","severity":"error"}],"data":null}`,
+		},
 	}
 
 	for _, tc := range testCases {

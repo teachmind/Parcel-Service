@@ -93,7 +93,7 @@ func TestRepository_InsertParcel(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 
-	t.Run("should return sql error", func(t *testing.T) {
+	t.Run("should return prepare statement error", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 
