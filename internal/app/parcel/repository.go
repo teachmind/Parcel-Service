@@ -34,7 +34,7 @@ func (r *repository) InsertParcel(ctx context.Context, parcel model.Parcel) (mod
 	stmt, err := r.db.PrepareNamedContext(ctx, insertParcelQuery)
 
 	if err != nil {
-		log.Error().Err(err).Msgf("[InsertParcel] from statemtnt: %v", err)
+		log.Error().Err(err).Msgf("[InsertParcel] PrepareNamedContext Error: %v", err)
 		return model.Parcel{}, err
 	}
 
@@ -44,7 +44,7 @@ func (r *repository) InsertParcel(ctx context.Context, parcel model.Parcel) (mod
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Code == errUniqueViolation {
 			return model.Parcel{}, fmt.Errorf("%v :%w", err, model.ErrInvalid)
 		}
-		log.Error().Err(err).Msgf("[FetchParcelByID] Error from getcontext 2: %v", err)
+		log.Error().Err(err).Msgf("[InsertParcel] GetContext Error: %v", err)
 		return model.Parcel{}, err
 	}
 
