@@ -68,7 +68,7 @@ func TestRepository_InsertParcel(t *testing.T) {
 		defer db.Close()
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectPrepare("INSERT INTO parcel (.+) VALUES (.+)").ExpectQuery().
+		m.ExpectPrepare("INSERT INTO parcel (.+) VALUES (.+) RETURNING .+").ExpectQuery().
 			WillReturnError(&pq.Error{Code: "23505"})
 
 		repo := NewRepository(sqlxDB)
@@ -82,7 +82,7 @@ func TestRepository_InsertParcel(t *testing.T) {
 		defer db.Close()
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectPrepare("INSERT INTO parcel (.+) VALUES (.+)").ExpectQuery().
+		m.ExpectPrepare("INSERT INTO parcel (.+) VALUES (.+) RETURNING .+").ExpectQuery().
 			WillReturnError(errors.New("sql-error"))
 
 		repo := NewRepository(sqlxDB)

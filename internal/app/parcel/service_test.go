@@ -30,9 +30,10 @@ func TestService_CreateParcel(t *testing.T) {
 	defer ctrl.Finish()
 
 	testCases := []struct {
-		desc     string
-		mockRepo func() *mocks.MockParcelRepository
-		expErr   error
+		desc      string
+		mockRepo  func() *mocks.MockParcelRepository
+		expParcel model.Parcel
+		expErr    error
 	}{
 		{
 			desc: "should return success",
@@ -41,7 +42,8 @@ func TestService_CreateParcel(t *testing.T) {
 				r.EXPECT().InsertParcel(gomock.Any(), gomock.Any()).Return(parcel, nil)
 				return r
 			},
-			expErr: nil,
+			expParcel: parcel,
+			expErr:    nil,
 		},
 
 		{
@@ -51,14 +53,16 @@ func TestService_CreateParcel(t *testing.T) {
 				r.EXPECT().InsertParcel(gomock.Any(), gomock.Any()).Return(model.Parcel{}, errors.New("db-error"))
 				return r
 			},
-			expErr: errors.New("db-error"),
+			expParcel: model.Parcel{},
+			expErr:    errors.New("db-error"),
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			s := NewService(tc.mockRepo())
-			_, err := s.CreateParcel(context.Background(), parcel)
+			parcel, err := s.CreateParcel(context.Background(), parcel)
+			assert.EqualValues(t, tc.expParcel, parcel)
 			assert.Equal(t, tc.expErr, err)
 		})
 	}
