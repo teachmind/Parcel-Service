@@ -25,6 +25,111 @@ var parcel = model.Parcel{
 	UpdatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
 }
 
+func TestService_GetParcels(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	status := 1
+	limit := 2
+	offset := 4
+
+	parcels := []model.Parcel{
+		{
+			ID:                 1,
+			UserID:             1,
+			CarrierID:          0,
+			Status:             0,
+			SourceAddress:      "Dhaka Bangladesh",
+			DestinationAddress: "Pabna Shadar",
+			ParcelType:         "Document",
+			Price:              200,
+			CarrierFee:         180,
+			CompanyFee:         20,
+		}, {
+			ID:                 1,
+			UserID:             1,
+			SourceAddress:      "Dhaka Bangladesh",
+			DestinationAddress: "Pabna Shadar",
+			ParcelType:         "Document",
+			Price:              200,
+			CarrierFee:         180,
+			CompanyFee:         20,
+		}}
+
+	testCases := []struct {
+		desc      string
+		status    int
+		offset    int
+		limit     int
+		mockRepo  func() *mocks.MockParcelRepository
+		expErr    error
+		expParcel []model.Parcel
+	}{
+		{
+			desc:   "should return success",
+			status: 1,
+			offset: 2,
+			limit:  4,
+			mockRepo: func() *mocks.MockParcelRepository {
+				r := mocks.NewMockParcelRepository(ctrl)
+				r.EXPECT().GetParcelsList(gomock.Any(), status, limit, offset).Return(parcels, nil)
+				return r
+			},
+			expErr:    nil,
+			expParcel: parcels,
+		},
+
+		{
+			desc:   "Should return not found",
+			status: 1,
+			offset: 2,
+			limit:  4,
+			mockRepo: func() *mocks.MockParcelRepository {
+				r := mocks.NewMockParcelRepository(ctrl)
+				r.EXPECT().GetParcelsList(gomock.Any(), status, limit, offset).Return([]model.Parcel{}, model.ErrNotFound)
+				return r
+			},
+			expErr:    model.ErrNotFound,
+			expParcel: []model.Parcel{},
+		},
+		{
+			desc:   "should return DB error",
+			status: 1,
+			offset: 2,
+			limit:  4,
+			mockRepo: func() *mocks.MockParcelRepository {
+				r := mocks.NewMockParcelRepository(ctrl)
+				r.EXPECT().GetParcelsList(gomock.Any(), status, limit, offset).Return([]model.Parcel{}, errors.New("db-error"))
+				return r
+			},
+			expErr:    errors.New("db-error"),
+			expParcel: []model.Parcel{},
+		},
+		{
+			desc:   "should return empty parcel",
+			status: 1,
+			offset: 2,
+			limit:  4,
+			mockRepo: func() *mocks.MockParcelRepository {
+				r := mocks.NewMockParcelRepository(ctrl)
+				r.EXPECT().GetParcelsList(gomock.Any(), status, limit, offset).Return([]model.Parcel{}, nil)
+				return r
+			},
+			expErr:    nil,
+			expParcel: []model.Parcel{},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			s := NewService(tc.mockRepo())
+			parcels, err := s.GetParcels(context.Background(), status, limit, offset)
+			assert.Equal(t, tc.expErr, err)
+			assert.EqualValues(t, tc.expParcel, parcels)
+		})
+	}
+}
+
 func TestService_CreateParcel(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -113,7 +218,7 @@ func TestService_GetParcelByID(t *testing.T) {
 			expParcel: model.Parcel{},
 		},
 		{
-			desc:     "should return empty parcel",
+			desc:     "should return empty parcel list",
 			parcelID: 1,
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)
