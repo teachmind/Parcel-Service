@@ -14,8 +14,9 @@ import (
 // SQL Query and error
 const (
 	errUniqueViolation   = pq.ErrorCode("23505")
+	getParcelListQuery   = `SELECT user_id, status, source_address, destination_address, type, price, carrier_fee, company_fee FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3`
 	insertParcelQuery    = `INSERT INTO parcel (user_id, source_address, destination_address, source_time, type, price, carrier_fee, company_fee) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-	fetchParcelByIDQuery = `SELECT * FROM parcel WHERE id = $1`
+	fetchParcelByIDQuery = `SELECT user_id, status, source_address, destination_address, type, price, carrier_fee, company_fee FROM parcel WHERE id = $1`
 	updateParcelQuery    = `UPDATE parcel SET status = $1 WHERE id = $2`
 )
 
@@ -47,6 +48,18 @@ func (r *repository) InsertParcel(ctx context.Context, parcel model.Parcel) erro
 		return err
 	}
 	return nil
+}
+
+func (r *repository) GetParcelsList(ctx context.Context, status int, limit int, offset int) ([]model.Parcel, error) {
+	var parcels []model.Parcel
+	if err := r.db.SelectContext(ctx, &parcels, getParcelListQuery, status, limit, offset); err != nil {
+		if err == sql.ErrNoRows {
+			log.Error().Err(err).Msgf("[GetParcelsList] failed to fetch parcel list Error: %v", err)
+			return nil, fmt.Errorf("parcel list for offset %d is not found. :%w", offset, sql.ErrNoRows)
+		}
+		return nil, err
+	}
+	return parcels, nil
 }
 
 func (r *repository) FetchParcelByID(ctx context.Context, parcelID int) (model.Parcel, error) {

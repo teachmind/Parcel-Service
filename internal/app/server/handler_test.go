@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"parcel-service/internal/app/model"
@@ -88,6 +89,106 @@ func TestNewParcel(t *testing.T) {
 	}
 }
 
+func TestGetParcel(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	parcel := model.Parcel{
+		ID:                 1,
+		UserID:             1,
+		SourceAddress:      "Dhaka Bangladesh",
+		DestinationAddress: "Pabna Shadar",
+		SourceTime:         time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+		ParcelType:         "Document",
+		Price:              200.0,
+		CarrierFee:         180.0,
+		CompanyFee:         20.0,
+		CreatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+		UpdatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+	}
+
+	testCases := []struct {
+		desc          string
+		mockParcelSvc func() *mocks.MockParcelService
+		parcelID      string
+		expStatusCode int
+		expResponse   string
+	}{
+		{
+			desc: "should success",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().GetParcelByID(gomock.Any(), parcel.ID).Return(parcel, nil)
+				return s
+			},
+			parcelID:      "1",
+			expStatusCode: http.StatusOK,
+			expResponse:   `{"success":true,"errors":null,"data":{"id":1,"user_id":1,"carrier_id":0,"status":0,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2020-04-11T21:34:01Z","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"2020-04-11T21:34:01Z","updated_at":"2020-04-11T21:34:01Z"}}`,
+		},
+		{
+			desc: "should return ID not exist",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().GetParcelByID(gomock.Any(), parcel.ID).Return(model.Parcel{}, model.ErrInvalid)
+				return s
+			},
+			parcelID:      "1",
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid","message_title":"This ID does not exist.","severity":"error"}],"data":null}`,
+		},
+		{
+			desc: "should return internal server error",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().GetParcelByID(gomock.Any(), parcel.ID).
+					Return(model.Parcel{}, errors.New("server-error"))
+				return s
+			},
+			parcelID:      "1",
+			expStatusCode: http.StatusInternalServerError,
+			expResponse:   `{"success":false,"errors":[{"code":"SERVER_ERROR","message":"server-error","message_title":"Failed to fetch parcel 1","severity":"error"}],"data":null}`,
+		},
+		{
+			desc: "should return not found error",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				s.EXPECT().GetParcelByID(gomock.Any(), parcel.ID).
+					Return(model.Parcel{}, model.ErrNotFound)
+				return s
+			},
+			parcelID:      "1",
+			expStatusCode: http.StatusNotFound,
+			expResponse:   `{"success":false,"errors":[{"code":"NOT FOUND","message":"not found","message_title":"This ID does not exist.","severity":"error"}],"data":null}`,
+		},
+		{
+			desc: "should return invalid parcel ID",
+			mockParcelSvc: func() *mocks.MockParcelService {
+				s := mocks.NewMockParcelService(ctrl)
+				return s
+			},
+			parcelID:      "__",
+			expStatusCode: http.StatusBadRequest,
+			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"strconv.Atoi: parsing \"__\": invalid syntax","message_title":"Invalid Parcel ID","severity":"error"}],"data":null}`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			s := NewServer(":8080", tc.mockParcelSvc(), nil)
+
+			w := httptest.NewRecorder()
+			body := strings.NewReader("")
+			r := httptest.NewRequest(http.MethodGet, "/api/v1/parcel/"+tc.parcelID, body)
+			r = mux.SetURLVars(r, map[string]string{"id": tc.parcelID})
+
+			router := mux.NewRouter()
+			router.Methods(http.MethodGet).Path("/api/v1/parcel/{id}").HandlerFunc(s.getParcel)
+			router.ServeHTTP(w, r)
+			assert.Equal(t, tc.expStatusCode, w.Code)
+			assert.Equal(t, tc.expResponse, w.Body.String())
+		})
+	}
+}
+
 func TestAddCarrierRequest(t *testing.T) {
 	payload := `{ "carrier_id":1, "parcel_id":1 }`
 	ctrl := gomock.NewController(t)
@@ -161,26 +262,49 @@ func TestAddCarrierRequest(t *testing.T) {
 		})
 	}
 }
-func TestGetParcel(t *testing.T) {
+
+func TestGetPercels(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	parcel := model.Parcel{
-		UserID:             1,
-		SourceAddress:      "Dhaka Bangladesh",
-		DestinationAddress: "Pabna Shadar",
-		SourceTime:         time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
-		ParcelType:         "Document",
-		Price:              200.0,
-		CarrierFee:         180.0,
-		CompanyFee:         20.0,
-		CreatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
-		UpdatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+
+	statusArray := map[string]int{"statusOne": 1, "statusTwo": 0, "statusThree": 1}
+	limitArray := map[string]int{"limitOne": 2, "limitTwo": 2, "limitThree": 2}
+	offsetArray := map[string]int{"offsetOne": 0, "offsetTwo": 0, "offsetThree": -1}
+
+	parcels := []model.Parcel{
+		{
+			UserID:             1,
+			Status:             1,
+			SourceAddress:      "Dhaka Bangladesh",
+			DestinationAddress: "Pabna Shadar",
+			SourceTime:         time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+			ParcelType:         "Document",
+			Price:              200.0,
+			CarrierFee:         180.0,
+			CompanyFee:         20.0,
+			CreatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+			UpdatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+		}, {
+			UserID:             2,
+			Status:             1,
+			SourceAddress:      "Dhaka Bangladesh",
+			DestinationAddress: "Pabna Shadar",
+			SourceTime:         time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+			ParcelType:         "Document",
+			Price:              200.0,
+			CarrierFee:         180.0,
+			CompanyFee:         20.0,
+			CreatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+			UpdatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+		},
 	}
 
 	testCases := []struct {
 		desc          string
 		mockParcelSvc func() *mocks.MockParcelService
-		parcelID      string
+		status        string
+		offset        string
+		limit         string
 		expStatusCode int
 		expResponse   string
 	}{
@@ -188,57 +312,40 @@ func TestGetParcel(t *testing.T) {
 			desc: "should success",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcelByID(gomock.Any(), 1).Return(parcel, nil)
+				s.EXPECT().GetParcels(gomock.Any(), statusArray["statusOne"], limitArray["limitOne"], offsetArray["offsetOne"]).Return(parcels, nil)
 				return s
 			},
-			parcelID:      "1",
+			status:        "1",
+			offset:        "0",
+			limit:         "2",
 			expStatusCode: http.StatusOK,
-			expResponse:   `{"success":true,"errors":null,"data":{"id":0,"user_id":1,"carrier_id":0,"status":0,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2020-04-11T21:34:01Z","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"2020-04-11T21:34:01Z","updated_at":"2020-04-11T21:34:01Z"}}`,
+			expResponse:   `{"success":true,"errors":null,"data":[{"id":0,"user_id":1,"carrier_id":0,"status":1,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2020-04-11T21:34:01Z","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"2020-04-11T21:34:01Z","updated_at":"2020-04-11T21:34:01Z"},{"id":0,"user_id":2,"carrier_id":0,"status":1,"source_address":"Dhaka Bangladesh","destination_address":"Pabna Shadar","source_time":"2020-04-11T21:34:01Z","type":"Document","price":200,"carrier_fee":180,"company_fee":20,"created_at":"2020-04-11T21:34:01Z","updated_at":"2020-04-11T21:34:01Z"}]}`,
 		},
 		{
-			desc: "should return ID not exist",
+			desc: "should return empty parcel list",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcelByID(gomock.Any(), 1).Return(model.Parcel{}, model.ErrInvalid)
+				s.EXPECT().GetParcels(gomock.Any(), statusArray["statusTwo"], limitArray["limitTwo"], offsetArray["offsetTwo"]).Return(nil, nil)
 				return s
 			},
-			parcelID:      "1",
-			expStatusCode: http.StatusBadRequest,
-			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"invalid","message_title":"This ID does not exist.","severity":"error"}],"data":null}`,
+			status:        "0",
+			offset:        "0",
+			limit:         "2",
+			expStatusCode: http.StatusOK,
+			expResponse:   `{"success":true,"errors":null,"data":null}`,
 		},
 		{
 			desc: "should return internal server error",
 			mockParcelSvc: func() *mocks.MockParcelService {
 				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcelByID(gomock.Any(), 1).
-					Return(model.Parcel{}, errors.New("server-error"))
+				s.EXPECT().GetParcels(gomock.Any(), statusArray["statusThree"], limitArray["limitThree"], offsetArray["offsetThree"]).Return([]model.Parcel{}, errors.New("pq: OFFSET must not be negative"))
 				return s
 			},
-			parcelID:      "1",
+			status:        "1",
+			offset:        "-1",
+			limit:         "2",
 			expStatusCode: http.StatusInternalServerError,
-			expResponse:   `{"success":false,"errors":[{"code":"SERVER_ERROR","message":"server-error","message_title":"Failed to fetch parcel 1","severity":"error"}],"data":null}`,
-		},
-		{
-			desc: "should return internal server error",
-			mockParcelSvc: func() *mocks.MockParcelService {
-				s := mocks.NewMockParcelService(ctrl)
-				s.EXPECT().GetParcelByID(gomock.Any(), 1).
-					Return(model.Parcel{}, model.ErrNotFound)
-				return s
-			},
-			parcelID:      "1",
-			expStatusCode: http.StatusBadRequest,
-			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"not found","message_title":"This ID does not exist.","severity":"error"}],"data":null}`,
-		},
-		{
-			desc: "should return invalid parcel ID",
-			mockParcelSvc: func() *mocks.MockParcelService {
-				s := mocks.NewMockParcelService(ctrl)
-				return s
-			},
-			parcelID:      "__",
-			expStatusCode: http.StatusBadRequest,
-			expResponse:   `{"success":false,"errors":[{"code":"INVALID","message":"strconv.Atoi: parsing \"__\": invalid syntax","message_title":"Invalid Parcel ID","severity":"error"}],"data":null}`,
+			expResponse:   `{"success":false,"errors":[{"code":"SERVER_ERROR","message":"pq: OFFSET must not be negative","message_title":"Failed to fetch parcel list for given query params","severity":"error"}],"data":null}`,
 		},
 	}
 
@@ -248,11 +355,11 @@ func TestGetParcel(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			body := strings.NewReader("")
-			r := httptest.NewRequest(http.MethodGet, "/api/v1/parcel/"+tc.parcelID, body)
-			r = mux.SetURLVars(r, map[string]string{"id": tc.parcelID})
+			path := fmt.Sprintf("/api/v1/parcel?status=%s&offset=%s&limit=%s", tc.status, tc.offset, tc.limit)
+			r := httptest.NewRequest(http.MethodGet, path, body)
 
 			router := mux.NewRouter()
-			router.Methods(http.MethodGet).Path("/api/v1/parcel/{id}").HandlerFunc(s.getParcel)
+			router.Methods(http.MethodGet).Path("/api/v1/parcel").Queries("status", tc.status, "offset", tc.offset, "limit", tc.limit).HandlerFunc(s.getParcelList)
 			router.ServeHTTP(w, r)
 			assert.Equal(t, tc.expStatusCode, w.Code)
 			assert.Equal(t, tc.expResponse, w.Body.String())
