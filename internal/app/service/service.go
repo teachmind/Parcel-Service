@@ -9,13 +9,13 @@ import (
 //go:generate mockgen -source service.go -destination ./mocks/mock_service.go -package mocks
 
 type ParcelRepository interface {
-	InsertParcel(ctx context.Context, parcel model.Parcel) error
+	InsertParcel(ctx context.Context, parcel model.Parcel) (model.Parcel, error)
 	FetchParcelByID(ctx context.Context, parcelID int) (model.Parcel, error)
 	UpdateParcel(ctx context.Context, parcel model.Parcel) error
 }
 
 type ParcelService interface {
-	CreateParcel(ctx context.Context, parcel model.Parcel) error
+	CreateParcel(ctx context.Context, parcel model.Parcel) (model.Parcel, error)
 	GetParcelByID(ctx context.Context, parcelID int) (model.Parcel, error)
 	EditParcel(ctx context.Context, parcel model.Parcel) error
 }

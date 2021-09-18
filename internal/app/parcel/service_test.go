@@ -18,10 +18,11 @@ var parcel = model.Parcel{
 	DestinationAddress: "Pabna Shadar",
 	SourceTime:         time.Now(),
 	ParcelType:         "Document",
-	Status:             2,
 	Price:              200.0,
 	CarrierFee:         180.0,
 	CompanyFee:         20.0,
+	CreatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
+	UpdatedAt:          time.Date(2020, time.April, 11, 21, 34, 01, 0, time.UTC),
 }
 
 func TestService_CreateParcel(t *testing.T) {
@@ -37,7 +38,7 @@ func TestService_CreateParcel(t *testing.T) {
 			desc: "should return success",
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)
-				r.EXPECT().InsertParcel(gomock.Any(), gomock.Any()).Return(nil)
+				r.EXPECT().InsertParcel(gomock.Any(), gomock.Any()).Return(parcel, nil)
 				return r
 			},
 			expErr: nil,
@@ -47,7 +48,7 @@ func TestService_CreateParcel(t *testing.T) {
 			desc: "should return db error",
 			mockRepo: func() *mocks.MockParcelRepository {
 				r := mocks.NewMockParcelRepository(ctrl)
-				r.EXPECT().InsertParcel(gomock.Any(), gomock.Any()).Return(errors.New("db-error"))
+				r.EXPECT().InsertParcel(gomock.Any(), gomock.Any()).Return(model.Parcel{}, errors.New("db-error"))
 				return r
 			},
 			expErr: errors.New("db-error"),
@@ -57,7 +58,7 @@ func TestService_CreateParcel(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			s := NewService(tc.mockRepo())
-			err := s.CreateParcel(context.Background(), parcel)
+			_, err := s.CreateParcel(context.Background(), parcel)
 			assert.Equal(t, tc.expErr, err)
 		})
 	}

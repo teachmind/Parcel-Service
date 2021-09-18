@@ -24,7 +24,9 @@ func (s *server) newParcel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.parcelService.CreateParcel(r.Context(), data); err != nil {
+	parcel, err := s.parcelService.CreateParcel(r.Context(), data)
+
+	if err != nil {
 		if errors.Is(err, model.ErrInvalid) {
 			ErrInvalidEntityResponse(w, "invalid parcel", err)
 			return
@@ -33,7 +35,8 @@ func (s *server) newParcel(w http.ResponseWriter, r *http.Request) {
 		ErrInternalServerResponse(w, "failed to create parcel", err)
 		return
 	}
-	SuccessResponse(w, http.StatusCreated, "successful")
+
+	SuccessResponse(w, http.StatusCreated, parcel)
 }
 
 func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
@@ -150,10 +153,6 @@ func (s *server) parcelCarrierAccept(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.carrierService.AssignCarrierToParcel(r.Context(), data); err != nil {
-		if errors.Is(err, model.ErrInvalid) {
-			ErrInvalidEntityResponse(w, "invalid Request", err)
-			return
-		}
 		log.Error().Err(err).Msgf("[parcelCarrierAccept] failed to assign carrier to parcel: %v", err)
 		ErrInternalServerResponse(w, "failed to assign carrier to parcel", err)
 		return

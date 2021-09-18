@@ -16,7 +16,7 @@ func NewService(repo svc.ParcelRepository) *service {
 	}
 }
 
-func (s *service) CreateParcel(ctx context.Context, parcel model.Parcel) error {
+func (s *service) CreateParcel(ctx context.Context, parcel model.Parcel) (model.Parcel, error) {
 	const (
 		CARRIER_FEE = 180.00
 		COMPANY_FEE = 20.00
