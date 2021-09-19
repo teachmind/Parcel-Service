@@ -11,6 +11,36 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+func (s *server) getParcelList(w http.ResponseWriter, r *http.Request) {
+	status, err := strconv.Atoi(r.URL.Query().Get("status"))
+	if err != nil {
+		ErrInvalidEntityResponse(w, "Invalid status value", err)
+		return
+	}
+	offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+	if err != nil {
+		ErrInvalidEntityResponse(w, "Invalid offset value", err)
+		return
+	}
+	limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+	if err != nil {
+		ErrInvalidEntityResponse(w, "Invalid limit value", err)
+		return
+	}
+
+	parcels, err := s.parcelService.GetParcels(r.Context(), status, limit, offset)
+	if err != nil {
+		if errors.Is(err, model.ErrInvalid) || errors.Is(err, model.ErrNotFound) {
+			ErrInvalidEntityResponse(w, "No data exist for these query parmas", err)
+			return
+		}
+		log.Error().Err(err).Msgf("[getParcelList] failed to get parcels for '%d', '%d', '%d': %v", status, limit, offset, err)
+		ErrInternalServerResponse(w, "Failed to fetch parcel list for given query params", err)
+		return
+	}
+	SuccessResponse(w, http.StatusOK, parcels)
+}
+
 func (s *server) newParcel(w http.ResponseWriter, r *http.Request) {
 	var data model.Parcel
 
@@ -24,7 +54,9 @@ func (s *server) newParcel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := s.parcelService.CreateParcel(r.Context(), data); err != nil {
+	parcel, err := s.parcelService.CreateParcel(r.Context(), data)
+
+	if err != nil {
 		if errors.Is(err, model.ErrInvalid) {
 			ErrInvalidEntityResponse(w, "invalid parcel", err)
 			return
@@ -33,7 +65,8 @@ func (s *server) newParcel(w http.ResponseWriter, r *http.Request) {
 		ErrInternalServerResponse(w, "failed to create parcel", err)
 		return
 	}
-	SuccessResponse(w, http.StatusCreated, "successful")
+
+	SuccessResponse(w, http.StatusCreated, parcel)
 }
 
 func (s *server) addCarrierRequest(w http.ResponseWriter, r *http.Request) {
@@ -84,8 +117,12 @@ func (s *server) getParcel(w http.ResponseWriter, r *http.Request) {
 	parcel, err := s.parcelService.GetParcelByID(r.Context(), data.ID)
 
 	if err != nil {
-		if errors.Is(err, model.ErrInvalid) || errors.Is(err, model.ErrNotFound) {
+		if errors.Is(err, model.ErrInvalid) {
 			ErrInvalidEntityResponse(w, "This ID does not exist.", err)
+			return
+		}
+		if errors.Is(err, model.ErrNotFound) {
+			ErrNotFoundResponse(w, "This ID does not exist.", err)
 			return
 		}
 		log.Error().Err(err).Msgf("[getParcel] failed to parcel '%d': %v", data.ID, err)
@@ -150,10 +187,6 @@ func (s *server) parcelCarrierAccept(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := s.carrierService.AssignCarrierToParcel(r.Context(), data); err != nil {
-		if errors.Is(err, model.ErrInvalid) {
-			ErrInvalidEntityResponse(w, "invalid Request", err)
-			return
-		}
 		log.Error().Err(err).Msgf("[parcelCarrierAccept] failed to assign carrier to parcel: %v", err)
 		ErrInternalServerResponse(w, "failed to assign carrier to parcel", err)
 		return
