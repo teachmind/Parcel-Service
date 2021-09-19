@@ -8,7 +8,7 @@ import (
 
 // ParcelRepository to Insert New Parcel and get parcel list
 type ParcelRepository interface {
-	InsertParcel(ctx context.Context, parcel model.Parcel) error
+	InsertParcel(ctx context.Context, parcel model.Parcel) (model.Parcel, error)
 	FetchParcelByID(ctx context.Context, parcelID int) (model.Parcel, error)
 	GetParcelsList(ctx context.Context, status int, limit int, offset int) ([]model.Parcel, error)
 	UpdateParcel(ctx context.Context, parcel model.Parcel) error
@@ -16,7 +16,7 @@ type ParcelRepository interface {
 
 // ParcelService to Create new parcel & get parcel list
 type ParcelService interface {
-	CreateParcel(ctx context.Context, parcel model.Parcel) error
+	CreateParcel(ctx context.Context, parcel model.Parcel) (model.Parcel, error)
 	GetParcelByID(ctx context.Context, parcelID int) (model.Parcel, error)
 	GetParcels(ctx context.Context, status int, limit int, offset int) ([]model.Parcel, error)
 	EditParcel(ctx context.Context, parcel model.Parcel) error

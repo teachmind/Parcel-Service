@@ -20,7 +20,7 @@ func (s *service) GetParcels(ctx context.Context, status int, limit int, offset 
 	return s.repo.GetParcelsList(ctx, status, limit, offset)
 }
 
-func (s *service) CreateParcel(ctx context.Context, parcel model.Parcel) error {
+func (s *service) CreateParcel(ctx context.Context, parcel model.Parcel) (model.Parcel, error) {
 	const (
 		CARRIER_FEE = 180.00
 		COMPANY_FEE = 20.00
