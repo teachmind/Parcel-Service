@@ -110,8 +110,8 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		defer db.Close()
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectQuery("SELECT (.+) FROM parcel WHERE (.+)").
-			WithArgs(parcel.ParcelID).
+		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+) AND (.+)").
+			WithArgs(parcel.ParcelID, parcel.Status).
 			WillReturnError(sql.ErrNoRows)
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)

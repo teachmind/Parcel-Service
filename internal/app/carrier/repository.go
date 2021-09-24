@@ -16,7 +16,7 @@ import (
 // sql query and error
 const (
 	errUniqueViolation = pq.ErrorCode("23505")
-	validateParcelId   = `SELECT * FROM parcel WHERE id = $1`
+	validateParcelId   = `SELECT * FROM parcel WHERE id = $1 AND status = $2`
 	updateAcceptQuery  = `UPDATE carrier_request SET status = $1 WHERE parcel_id = $2 AND carrier_id = $3`
 	updateRejectQuery  = `UPDATE carrier_request SET status = $1 WHERE parcel_id = $2 AND carrier_id != $3`
 	updateParcelStatus = `UPDATE parcel SET carrier_id = $1, status = $2, source_time = $3 WHERE id = $4`
@@ -45,8 +45,8 @@ func (r *repository) InsertCarrierRequest(ctx context.Context, request model.Car
 }
 
 func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.CarrierRequest, acceptStatus int, rejectStatus int, parcelStatus int, sourceTime time.Time) error {
-	var parcel1 model.Parcel
-	if err := r.db.GetContext(ctx, &parcel1, validateParcelId, parcel.ParcelID); err != nil {
+	var parcelValidation model.Parcel
+	if err := r.db.GetContext(ctx, &parcelValidation, validateParcelId, parcel.ParcelID, parcel.Status); err != nil {
 		if err == sql.ErrNoRows {
 			log.Error().Err(err).Msgf("[UpdateCarrierStatus] failed to fetch parcel Error: %v", err)
 			return fmt.Errorf("parcel %d is not found. :%w", parcel.ParcelID, model.ErrNotFound)
