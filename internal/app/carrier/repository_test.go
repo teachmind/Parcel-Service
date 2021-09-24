@@ -2,15 +2,16 @@ package carrier
 
 import (
 	"context"
-	"parcel-service/internal/app/model"
-	"testing"
-	"time"
-
+	"database/sql"
+	"errors"
+	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"parcel-service/internal/app/model"
+	"testing"
+	"time"
 )
 
 func TestRepository_InsertCarrierRequest(t *testing.T) {
@@ -102,6 +103,20 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
 		assert.Nil(t, err)
+	})
+
+	t.Run("should return no rows error", func(t *testing.T) {
+		db, m, _ := sqlmock.New()
+		defer db.Close()
+
+		sqlxDB := sqlx.NewDb(db, "sqlmock")
+		m.ExpectQuery("SELECT (.+) FROM parcel WHERE (.+)").
+			WithArgs(parcel.ParcelID).
+			WillReturnError(sql.ErrNoRows)
+		repo := NewRepository(sqlxDB)
+		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
+		fmt.Println(err)
+		assert.True(t, errors.Is(err, model.ErrNotFound))
 	})
 
 	t.Run("should return internal server error", func(t *testing.T) {
