@@ -53,7 +53,6 @@ func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.Carr
 		}
 		return err
 	}
-
 	//starting db transaction
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
