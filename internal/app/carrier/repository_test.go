@@ -2,9 +2,7 @@ package carrier
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -105,17 +103,18 @@ func TestRepository_UpdateCarrierRequest(t *testing.T) {
 		assert.Nil(t, err)
 	})
 
-	t.Run("should return no rows error", func(t *testing.T) {
+	t.Run("should return invalid ID", func(t *testing.T) {
 		db, m, _ := sqlmock.New()
 		defer db.Close()
 
 		sqlxDB := sqlx.NewDb(db, "sqlmock")
-		m.ExpectQuery("^SELECT (.+) FROM parcel WHERE (.+) AND (.+)").
-			WithArgs(parcel.ParcelID, parcel.Status).
-			WillReturnError(sql.ErrNoRows)
+		m.ExpectBegin()
+		m.ExpectExec("UPDATE carrier_request SET (.+) WHERE (.+) AND (.+)").
+			WithArgs(acceptStatus, parcel.ParcelID, parcel.CarrierID).
+			WillReturnResult(sqlmock.NewResult(1, 0))
+
 		repo := NewRepository(sqlxDB)
 		err := repo.UpdateCarrierRequest(context.Background(), parcel, acceptStatus, rejectStatus, parcelStatus, sourceTime)
-		fmt.Println(err)
 		assert.True(t, errors.Is(err, model.ErrNotFound))
 	})
 

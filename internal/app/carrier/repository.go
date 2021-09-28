@@ -2,7 +2,6 @@ package carrier
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"parcel-service/internal/app/model"
 	"time"
@@ -45,14 +44,6 @@ func (r *repository) InsertCarrierRequest(ctx context.Context, request model.Car
 }
 
 func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.CarrierRequest, acceptStatus int, rejectStatus int, parcelStatus int, sourceTime time.Time) error {
-	var parcelValidation model.Parcel
-	if err := r.db.GetContext(ctx, &parcelValidation, validateParcelId, parcel.ParcelID, parcel.Status); err != nil {
-		if err == sql.ErrNoRows {
-			log.Error().Err(err).Msgf("[UpdateCarrierStatus] failed to fetch parcel Error: %v", err)
-			return fmt.Errorf("parcel %d is not found. :%w", parcel.ParcelID, model.ErrNotFound)
-		}
-		return err
-	}
 	//starting db transaction
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -60,11 +51,25 @@ func (r *repository) UpdateCarrierRequest(ctx context.Context, parcel model.Carr
 		return fmt.Errorf("%v", err)
 	}
 	//accept status update for carrier request table
-	if _, err = tx.ExecContext(ctx, updateAcceptQuery, acceptStatus, parcel.ParcelID, parcel.CarrierID); err != nil {
+	result, err := tx.ExecContext(ctx, updateAcceptQuery, acceptStatus, parcel.ParcelID, parcel.CarrierID)
+	if err != nil {
 		tx.Rollback()
 		log.Error().Err(err).Msgf("[UpdateCarrierStatus] failed to update carrier_request table to accept: %v", err)
 		return err
 	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		tx.Rollback()
+		log.Error().Err(err).Msgf("[UpdateCarrierStatus] failed to update carrier_request table to accept: %v", err)
+		return fmt.Errorf("%v :%w", err, model.ErrInvalid)
+	}
+
+	if rows == 0 {
+		tx.Rollback()
+		log.Error().Err(err).Msgf("[UpdateCarrierStatus] failed to update invalid parcel id table to accept: %v", err)
+		return fmt.Errorf("parcel %d not updated, please provide valid ID. :%w", parcel.ID, model.ErrNotFound)
+	}
+
 	if _, err := tx.ExecContext(ctx, updateRejectQuery, rejectStatus, parcel.ParcelID, parcel.CarrierID); err != nil {
 		tx.Rollback()
 		log.Error().Err(err).Msgf("[UpdateCarrierStatus] failed to update carrier_request table to reject: %v", err)
