@@ -15,7 +15,6 @@ import (
 // sql query and error
 const (
 	errUniqueViolation = pq.ErrorCode("23505")
-	validateParcelId   = `SELECT * FROM parcel WHERE id = $1 AND status = $2`
 	updateAcceptQuery  = `UPDATE carrier_request SET status = $1 WHERE parcel_id = $2 AND carrier_id = $3`
 	updateRejectQuery  = `UPDATE carrier_request SET status = $1 WHERE parcel_id = $2 AND carrier_id != $3`
 	updateParcelStatus = `UPDATE parcel SET carrier_id = $1, status = $2, source_time = $3 WHERE id = $4`
