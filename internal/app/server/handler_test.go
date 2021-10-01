@@ -573,7 +573,7 @@ func TestParcelCarrierAccept(t *testing.T) {
 				s.EXPECT().AssignCarrierToParcel(gomock.Any(), gomock.Any()).Return(nil)
 				return s
 			},
-			expStatusCode: http.StatusCreated,
+			expStatusCode: http.StatusNoContent,
 			expResponse:   `{"success":true,"errors":null,"data":"Successful"}`,
 		},
 		{
