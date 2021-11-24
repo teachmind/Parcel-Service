@@ -14,9 +14,9 @@ import (
 // SQL Query and error
 const (
 	errUniqueViolation   = pq.ErrorCode("23505")
-	getParcelListQuery   = `SELECT user_id, status, source_address, destination_address, type, price, carrier_fee, company_fee FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3`
+	getParcelListQuery   = `SELECT id, user_id, carrier_id, status, source_address, destination_address, source_time, type, price, carrier_fee, company_fee, created_at, updated_at FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3`
 	insertParcelQuery    = `INSERT INTO parcel (user_id, source_address, destination_address, source_time, type, price, carrier_fee, company_fee) VALUES (:user_id, :source_address, :destination_address, :source_time, :type, :price, :carrier_fee, :company_fee) RETURNING id, created_at, updated_at`
-	fetchParcelByIDQuery = `SELECT user_id, status, source_address, destination_address, type, price, carrier_fee, company_fee FROM parcel WHERE id = $1`
+	fetchParcelByIDQuery = `SELECT id, user_id, carrier_id, status, source_address, destination_address, source_time, type, price, carrier_fee, company_fee, created_at, updated_at FROM parcel WHERE id = $1`
 	updateParcelQuery    = `UPDATE parcel SET status = $1 WHERE id = $2`
 )
 
