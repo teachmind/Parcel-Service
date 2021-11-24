@@ -4,7 +4,7 @@ APP_EXECUTABLE="./build/$(APP)"
 APP_COMMIT=$(shell git rev-parse HEAD)
 ALL_PACKAGES=$(shell go list ./... | grep -v "vendor")
 SOURCE_DIRS=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-COVERAGE_MIN=99
+COVERAGE_MIN=95
 
 .PHONY: build
 

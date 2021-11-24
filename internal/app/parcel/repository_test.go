@@ -116,27 +116,33 @@ func TestRepository_GetParcelsList(t *testing.T) {
 
 	parcels := []model.Parcel{
 		{
-			ID:                 0,
+			ID:                 1,
 			UserID:             1,
 			CarrierID:          0,
 			Status:             1,
 			SourceAddress:      "Dhaka Bangladesh",
 			DestinationAddress: "Pabna Shadar",
+			SourceTime:         time.Now(),
 			ParcelType:         "Document",
 			Price:              200,
 			CarrierFee:         180,
 			CompanyFee:         20,
+			CreatedAt:          time.Now(),
+			UpdatedAt:          time.Now(),
 		}, {
-			ID:                 0,
+			ID:                 2,
 			UserID:             2,
-			CarrierID:          0,
+			CarrierID:          10,
 			Status:             1,
 			SourceAddress:      "Dhaka Bangladesh",
 			DestinationAddress: "Pabna Shadar",
+			SourceTime:         time.Now(),
 			ParcelType:         "Document",
 			Price:              200,
 			CarrierFee:         180,
 			CompanyFee:         20,
+			CreatedAt:          time.Now(),
+			UpdatedAt:          time.Now(),
 		}}
 
 	t.Run("should return success", func(t *testing.T) {
@@ -149,10 +155,10 @@ func TestRepository_GetParcelsList(t *testing.T) {
 		limit = 2
 		offset = 0
 
-		m.ExpectQuery(regexp.QuoteMeta("SELECT user_id, status, source_address, destination_address, type, price, carrier_fee, company_fee FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3")).
-			WillReturnRows(sqlmock.NewRows([]string{"user_id", "status", "source_address", "destination_address", "type", "price", "carrier_fee", "company_fee"}).
-				AddRow(parcels[0].UserID, parcels[0].Status, parcels[0].SourceAddress, parcels[0].DestinationAddress, parcels[0].ParcelType, parcels[0].Price, parcels[0].CarrierFee, parcels[0].CompanyFee).
-				AddRow(parcels[1].UserID, parcels[1].Status, parcels[1].SourceAddress, parcels[1].DestinationAddress, parcels[1].ParcelType, parcels[1].Price, parcels[1].CarrierFee, parcels[1].CompanyFee))
+		m.ExpectQuery(regexp.QuoteMeta("SELECT id, user_id, carrier_id, status, source_address, destination_address, source_time, type, price, carrier_fee, company_fee, created_at, updated_at FROM parcel WHERE status=$1 LIMIT $2 OFFSET $3")).
+			WillReturnRows(sqlmock.NewRows([]string{"id", "user_id", "carrier_id", "status", "source_address", "destination_address", "source_time", "type", "price", "carrier_fee", "company_fee", "created_at", "updated_at"}).
+				AddRow(parcels[0].ID, parcels[0].UserID, parcels[0].CarrierID, parcels[0].Status, parcels[0].SourceAddress, parcels[0].DestinationAddress, parcels[0].SourceTime, parcels[0].ParcelType, parcels[0].Price, parcels[0].CarrierFee, parcels[0].CompanyFee, parcels[0].CreatedAt, parcels[0].UpdatedAt).
+				AddRow(parcels[1].ID, parcels[1].UserID, parcels[1].CarrierID, parcels[1].Status, parcels[1].SourceAddress, parcels[1].DestinationAddress, parcels[1].SourceTime, parcels[1].ParcelType, parcels[1].Price, parcels[1].CarrierFee, parcels[1].CompanyFee, parcels[1].CreatedAt, parcels[1].UpdatedAt))
 
 		repo := NewRepository(sqlxDB)
 		result, err := repo.GetParcelsList(context.Background(), status, limit, offset)
