@@ -46,6 +46,6 @@
 -   PostgreSQL
 
 ## Installation
--   **Step-1:** Copy/rename `.env.example` file as `.env`. Change the `APP_PORT`, `DB_PORT`, `DB_NAME`,`DB_HOST`, `DB_USER`, `DB_PASSWORD` value as per your DB and Project setup.
+-   **Step-1:** Copy/rename `.env.example` file as `.env`. Change the `APP_PORT`, `DB_PORT`, `DB_NAME`,`DB_HOST`, `DB_USER`, `DB_PASSWORD` value as per your DB and Project setup. Copy command from `Makefile`
 -   **Step-2:** Run migration command `make migrate` for Database migration
 -   **Step-3:** To start server run `make server`
